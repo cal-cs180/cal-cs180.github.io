@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+
+<head>
+  <title>How to submit assignments for CS180/CS280A</title>
+  <style>
+    code i {
+      color: rgb(107, 107, 107);
+    }
+
+  </style>
+</head>
+
+
+<body>
+  <header>
+    <h1>How to submit assignments for CS180/CS280A.</h1>
+  </header>
+  <p>
+    For each assignment, you will be required to submit two deliverables to
+    Gradescope and share your website link via Google Form to showcase your work alongside your classmates. <br>
+    Note: Upload exactly <b>one</b> <code>.zip</code> file (maximum <b>100 MB</b>). Inside that
+    zip, you may include at most <b>256 files</b> in total (see
+    <a href="https://guides.gradescope.com/hc/en-us/articles/21865616724749-Submitting-a-Code-assignment" target="_blank">Gradescope docs</a>).
+    <br>
+    Please upload a <code>.zip</code> adhering to the following structure:
+  </p>
+  <code>
+    submission.zip<br />
+    ├─code/<br />
+    │ ├─main.ipynb &nbsp;&nbsp;<i># or main.py</i><br />
+    │ ├─utils.py&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i># generic example file, not needed</i><br />
+    │ └─README.txt&nbsp;&nbsp;&nbsp;<i># or markdown</i><br />
+    └─web/<br />
+    &nbsp;&nbsp;└─page.pdf <br />
+    <!-- &nbsp;&nbsp;└─sites.txt <br /> -->
+  </code>
+
+  Starting from Project 2, you should <b>ALSO</b> submit the pdf to a separate assignment on Gradescope (marked as "website pdf ONLY"), and tag each part of the assignment to each problem.
+
+  <br>
+  <h2>1. Code</h2>
+  <p>
+    You should upload code <i>only</i> to Gradescope. <b>Do <i>not</i> host your code publicly.</b>
+  </p>
+  <ul>
+    <li>
+      All of your project code should be contained in some
+      <code>main.py</code> or <code>main.ipynb</code> that the grader / we can run to reproduce your
+      results. If you have a complex workflow, try to simplify it first, and then make sure to upload all the necessary files and include a
+      <code>README.txt</code> file describing how we can run your code.
+    </li>
+    <li>
+      (If applicable) please be sure to appropriately comment your code so that the graders can appropriately identify where your
+      implementations lie and what they do.
+    </li>
+    <li>
+      Place all of your coding files in the <code>code/</code> directory. They should be distinct from your web files.
+    </li>
+  </ul>
+
+  <br>
+  <h2>2. Webpage Report</h2>
+  <ul>
+    <li>
+      You should upload a <code>web/</code> folder contains <code>page.pdf</code>.
+    </li>
+    <li>
+      <code>page.pdf</code> should be a PDF of your webpage (i.e. printing the page and saving it as a PDF). If you do not already have a webpage set up, we recommend using GitHub Pages (<a
+      href="./gh-pages.html">tutorial</a>).
+      <ul>
+        <li>
+          Print your webpage as a PDF <u>with the URL in the header/footer</u> (see image below for the "Headers and footers" option). This allows us to go see your original webpage with your fancy animations
+          <br><img src="assets/pdf_header_option.jpg" alt="PDF print settings showing Headers and footers option" style="max-width: 300px; margin: 10px 0;">
+        </li>
+      </ul>
+    <li>
+      It's your responsibility to ensure that if your page contains animations or interactivity (which cannot be captured in a PDF), this is clearly communicated, for example, by noting it in the PDF.
+    </li>
+    <li>You may consider compressing the PDF
+      file if you hit the 100Mb size limit
+      (e.g. with <a href="https://www.adobe.com/acrobat/online/compress-pdf.html">this</a>)</li>
+    </li>
+    <!-- <li>
+      <code>sites.txt</code> should be a have two lines (and nothing else!):
+    </li> -->
+  </ul>
+  <p>
+    If you have any comments, even if they're about web and not code, please include them in <code>./code/README.txt</code>
+  </p>
+
+  <br>
+  <h2>3. Google Form</h2>
+  <p>
+    Share your website link through the Google Form (for each project) to showcase your project alongside your classmates' work! This creates a public gallery where everyone can explore each other's projects. The form link will be posted on each respective project page.
+  </p>
+</body>
+
+</html>

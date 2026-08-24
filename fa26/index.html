@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      CS180/280A: Intro to Computer Vision and Computational Photography
+    </title>
+    <meta name="description" content="CS180/280A Introduction to Computer Vision and Computational Photography at UC Berkeley - Fall 2025. Hands-on course covering image processing, computer vision, and computational photography." />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .section-captions {
+        position: fixed;
+        top: 15rem;
+        left: max(1rem, calc((100vw - 1200px) / 2));
+        width: 240px;
+        max-height: calc(100vh - 17rem);
+        overflow-y: auto;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin: 0;
+        border: 1px solid var(--border-gray);
+        border-radius: var(--border-radius);
+        background: var(--light-gray);
+        padding: 1rem 0.75rem;
+        box-shadow: var(--box-shadow);
+      }
+      .section-captions a {
+        border: 0;
+        border-left: 3px solid transparent;
+        background: transparent;
+        color: var(--berkeley-blue);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 600;
+        padding: 0.6rem 0.75rem;
+        text-align: left;
+      }
+      .section-captions a:hover,
+      .section-captions a.active {
+        border-left-color: var(--california-gold);
+        color: var(--founders-rock);
+      }
+      main.container {
+        position: relative;
+        display: block;
+        padding-left: 270px;
+      }
+      main > section {
+        margin-left: 0;
+      }
+      main > .course-info-section:first-of-type {
+        background-color: transparent;
+        border-left: 0;
+        padding-left: 0;
+      }
+      @media (max-width: 700px) {
+        main.container { padding-left: var(--space-sm); }
+        .section-captions {
+          position: static;
+          top: auto;
+          width: auto;
+          max-height: none;
+          overflow: visible;
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 0.75rem 1rem;
+          margin: 0 0 2rem;
+          border: 0;
+          border-bottom: 1px solid var(--border-gray);
+          padding-right: 0;
+          padding: 0 0 0.5rem;
+        }
+        .section-captions a {
+          border-left: 0;
+          border-bottom: 2px solid transparent;
+          padding: 0.5rem 0 0.65rem;
+        }
+        .section-captions a.active { border-bottom-color: var(--california-gold); }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <img
+            src="./463_files/ucbseal_139_540.png"
+            alt="UC Berkeley Seal"
+            class="logo"
+          />
+          <div>
+            <h1 class="course-title">
+              CS180/280A: Intro to Computer Vision and Computational Photography
+            </h1>
+            <div class="course-info">
+              <a href="http://www.cs.berkeley.edu/">
+                Computer Science Division
+              </a><br />
+              <a href="http://www.berkeley.edu/">
+                University of California, Berkeley
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+
+      <section class="course-info-section">
+        <h2>Course Information</h2>
+        <p>
+          <strong>Instructor:</strong>
+          <a href="https://people.eecs.berkeley.edu/~efros/">Alexei (Alyosha) Efros</a>,
+          <a href="https://www2.eecs.berkeley.edu/Faculty/Homepages/yirenng.html">Ren Ng</a><br />
+          <strong>GSI:</strong>
+          <a href="https://nithinvc.github.io/">Nithin Vengatha Chalapathi</a>,
+          <a href="https://hgaurav2k.github.io/">Himanshu Gaurav Singh</a>,
+          <a href="https://hongsukchoi.github.io/">Hongsuk Choi</a><br />
+          <strong>Tutors:</strong>
+          Aditi Mundra,
+          Andrew Phillip Goldberg,
+          <a href="https://www.linkedin.com/in/eric-khodorenko">Eric Khodorenko</a><br />
+          <strong>Ed:</strong>
+          <a href="https://edstem.org/us/courses/83238/discussion">URL</a> | <a href="https://edstem.org/us/join/dMpHBv">access code</a><br />
+          <strong>Course:</strong> CS 180/280A<br />
+          <strong>Meeting:</strong> TuTh 14:00-15:29<br />
+          <strong>Location:</strong> The Gateway Building 1210
+        </p>
+      </section>
+
+      <section class="course-info-section">
+        <h2>Office Hours</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-cell">Person</th>
+                <th class="table-header-cell">Time</th>
+                <th class="table-header-cell">Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="table-cell">Alexei (Alyosha) Efros and Ren Ng</td>
+                <td class="table-cell">After class</td>
+                <td class="table-cell">The Gateway Building 1210</td>
+              </tr>
+              <tr>
+                <td class="table-cell">Nithin Vengatha Chalapathi</td>
+                <td class="table-cell">TBD</td>
+                <td class="table-cell">TBD</td>
+              </tr>
+              <tr>
+                <td class="table-cell">Himanshu Gaurav Singh</td>
+                <td class="table-cell">TBD</td>
+                <td class="table-cell">TBD</td>
+              </tr>
+              <tr>
+                <td class="table-cell">Hongsuk Choi</td>
+                <td class="table-cell">TBD</td>
+                <td class="table-cell">TBD</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="course-info-section">
+        <h2>Prerequisites</h2>
+        <p>
+          This is a heavily project-oriented class, therefore good programming
+          proficiency (at least <strong>CS 61B</strong>) is absolutely essential and
+          required. Moreover, working knowledge of linear algebra (<strong
+            >MATH 54, MATH 56, MATH 110, or EECS 16A</strong
+          >) and multivariate calculus (e.g. <strong>MATH 53</strong>) are vital.
+          Experience with machine learning and neural networks is required in
+          the second part of the course. You must have taken beforehand or
+          are currently taking (<strong>CS 182 or CS 189</strong>). Due to the
+          open-endedness of this course, creativity is a class requirement.
+        </p>
+      </section>
+
+      <section class="course-info-section">
+        <h2>Discussions</h2>
+        <p>
+          Discussions are GSI-led worksheets designed to help you better understand the concepts in class and in the projects. Attendance optional, but encouraged. Sheets and solutions will be posted after each week.
+        </p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-cell">Person</th>
+                <th class="table-header-cell">Time</th>
+                <th class="table-header-cell">Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="table-cell">Nithin Vengatha Chalapathi</td>
+                <td class="table-cell">TBD</td>
+                <td class="table-cell">TBD</td>
+              </tr>
+              <tr>
+                <td class="table-cell">Himanshu Gaurav Singh</td>
+                <td class="table-cell">TBD</td>
+                <td class="table-cell">TBD</td>
+              </tr>
+              <tr>
+                <td class="table-cell">Hongsuk Choi</td>
+                <td class="table-cell">TBD</td>
+                <td class="table-cell">TBD</td>
+              </tr>
+              <tr>
+                <td class="table-cell">Eric Khodorenko</td>
+                <td class="table-cell">TBD</td>
+                <td class="table-cell">TBD</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Topics</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-cell text-center" style="width: 15%">Discussion</th>
+                <th class="table-header-cell" style="width: 55%">Topic</th>
+                <th class="table-header-cell" style="width: 30%">Materials</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 1</td>
+                <td class="table-cell">Python & NumPy Fundamentals for Computer Vision</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc1_normal.pdf">Main sheet</a> |
+                  <a href="./discussions/cs180_disc1_bonus.pdf">Challenge</a> |
+                  <a href="./discussions/cs180_disc1_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc1_konpat.pdf">Slides</a> |
+                  <a href="./discussions/basics.ipynb" download="basics.ipynb">Python notebook</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 2</td>
+                <td class="table-cell">Image formation</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc2_normal.pdf">Main sheet</a> |
+                  <a href="./discussions/cs180_disc2_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc2_konpat.pdf">Slides</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 3</td>
+                <td class="table-cell">Filtering and Frequencies</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc3_normal.pdf">Sheet</a> |
+                  <a href="./discussions/cs180_disc3_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc3_konpat.pdf">Slides</a> |
+                  <a href="./fft-tool.html">FFT Demo Tool</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 4</td>
+                <td class="table-cell">2D Transformations and Warping</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc4_normal.pdf">Sheet</a> |
+                  <a href="./discussions/cs180_disc4_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc4_konpat.pdf">Slides</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 5</td>
+                <td class="table-cell">Homography</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc5_normal.pdf">Sheet</a> |
+                  <a href="./discussions/cs180_disc5_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc5.pdf">Slides</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 6</td>
+                <td class="table-cell">Automated correspondence</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc6_normal.pdf">Sheet</a> |
+                  <a href="./discussions/cs180_disc6_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc6.pdf">Slides</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 7</td>
+                <td class="table-cell">Midterm Review</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc7_midterm.pdf">Slides</a> |
+                  <a href="https://docs.google.com/presentation/d/13nzUQjG47MULgqZ8r0zJf4A_g5wkz_BTPMrzA3pkJbo/edit?usp=sharing">Google Slides</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 8</td>
+                <td class="table-cell">No Discussion</td>
+                <td class="table-cell">—</td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 9</td>
+                <td class="table-cell">World, Camera, Pixels, Rays</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc8_normal.pdf">Sheet</a> |
+                  <a href="./discussions/cs180_disc8_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc8_konpat.pdf">Slides</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <td class="table-cell text-center">Week 10</td>
+                <td class="table-cell">NeRF</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc9_normal.pdf">Sheet</a> |
+                  <a href="./discussions/cs180_disc9_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc9_konpat.pdf">Slides</a>
+                </td>
+              </tr>
+            </tbody>
+          <tbody>
+            <tr>
+              <td class="table-cell text-center">Week 11</td>
+              <td class="table-cell">No Discussion</td>
+              <td class="table-cell">—</td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <td class="table-cell text-center">Week 12</td>
+              <td class="table-cell">Diffusion / Flow + CFG</td>
+              <td class="table-cell">
+                <a href="./discussions/cs180_disc10_normal_v2.pdf">Sheet</a> |
+                <a href="./discussions/cs180_disc10_solutions_v2_konpat.pdf">Solutions</a> |
+                <a href="./discussions/cs180_disc10_konpat_v2.pdf">Slides</a>
+              </td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <td class="table-cell text-center">Week 13</td>
+              <td class="table-cell">Flow Matching II</td>
+              <td class="table-cell">
+                <a href="./discussions/cs180_disc11_normal.pdf">Sheet</a> |
+                <a href="./discussions/cs180_disc11_solutions.pdf">Solutions</a> |
+                <a href="https://docs.google.com/presentation/d/1aDNIEtcb_MWqay_Hw7R_s3rm5L4fHlzt43s5bdFz-SY/edit?usp=sharing">Slides</a>
+              </td>
+            </tr>
+          </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="course-info-section">
+        <h2>Course Description</h2>
+        <p>
+          The aim of this advanced undergraduate course is to introduce students
+          to computing with visual data (images and video). We will cover
+          acquisition, representation, and manipulation of visual information
+          from digital photographs (image processing), image analysis and visual
+          understanding (computer vision), and image synthesis (computational
+          photography). Key algorithms will be presented, ranging from classical
+          (e.g. Gaussian and Laplacian Pyramids) to contemporary (e.g. ConvNets,
+          GANs), with an emphasis on using these techniques to build practical
+          systems. This hands-on emphasis will be reflected in the programming
+          projects, in which students will have the opportunity to acquire
+          their own images and develop, largely from scratch, the image analysis
+          and synthesis tools for solving applications.
+        </p>
+      </section>
+
+      <section class="projects-section">
+        <h2>Programming Projects</h2>
+
+        <div class="project-item">
+          <h3>
+            <a href="hw/proj0/index.html">
+              Project 0: Becoming Friends with Your Camera
+            </a>
+          </h3>
+          <img
+            src="hw/proj0/selfie.png"
+            alt="Close portrait comparison"
+            class="example"
+          />
+          <p>
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1TMA_uP_dpiSN_L2lFsDPQzF57vl6OQ35nHKzAKAUy6s/edit?usp=sharing">here</a>.
+          </p>
+        </div>
+
+        <div class="project-item">
+          <h3>
+            <a href="hw/proj1/index.html">
+              Project 1: Images of the Russian Empire -- Colorizing the Prokudin-Gorskii Photo Collection
+            </a>
+          </h3>
+          <img
+            src="463_files/image004.jpg"
+            alt="Colorized Russian Empire photograph by Prokudin-Gorskii"
+          />
+          <p>
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/16GytIAh3VaZboPav4smw5rzTGE8vmDA4yvg8xMXcFjY/edit?usp=sharing">here</a>.
+          </p>
+          <div class="class-choice">
+            <img src="463_files/cup_gold.png" alt="Gold award" />
+            <strong>Class Choice Award: TBD!</strong>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <h3>
+            <a href="hw/proj2/index.html">
+              Project 2: Fun with Filters and Frequencies
+            </a>
+          </h3>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <img src="463_files/hybrid.png" alt="Hybrid image example" style="max-width: 262px;" />
+            <img src="463_files/orple.jpg" alt="Orange-apple hybrid" style="max-width: 262px;" />
+          </div>
+          <p>
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1fTCyFaqQJ61xQgaOysvfaPcPp4BTMVqdun0Z8tnp8DI/edit?usp=sharing">here</a>.
+          </p>
+          <div class="class-choice">
+            <img src="463_files/cup_gold.png" alt="Gold award" />
+            <strong>Class Choice Award: TBD!</strong>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <h3>
+            <a href="hw/proj3/index.html">
+              Project 3: (Auto)stitching and Photo Mosaics
+            </a>
+          </h3>
+          <img src="463_files/image028.jpg" alt="Photo stitching example" />
+          <p>
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/154EX_SseR8alNOnkXYRd4Yx5nWV4e2PiyPA1b71hOLM/edit?usp=sharing">here</a>.
+          </p>
+          <div class="class-choice">
+            <img src="463_files/cup_gold.png" alt="Gold award" />
+            <strong>Class Choice Award: TBD!</strong>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <h3>
+            <a href="hw/proj4/index.html">
+              Project 4: Neural Radiance Field
+            </a>
+          </h3>
+          <img src="463_files/nerf.png" alt="Neural Radiance Field example" />
+          <p>
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1VqohGepNmkO980vU0ac8gKz6mmpI5VlVhqRhwaIU5-M/edit?usp=sharing">here</a>.
+          </p>
+          <div class="class-choice">
+            <img src="463_files/cup_gold.png" alt="Gold award" />
+            <strong>Class Choice Award: TBD!</strong>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <h3>
+            <a href="hw/proj5/index.html">
+              Project 5: Fun with Diffusion Models
+            </a>
+          </h3>
+          <img src="463_files/proj5_index.png" alt="Diffusion example" />
+          <p>
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1nti5mT2-ZrTqt0Y8OwxGqKfqs0Q4sOfxniadioo1Lb0/edit?usp=sharing">here</a>.
+          </p>
+          <div class="class-choice">
+            <img src="463_files/cup_gold.png" alt="Gold award" />
+            <strong>Class Choice Award: TBD!</strong>
+          </div>
+        </div>
+
+        <!-- <div class="project-item">
+          <h3>
+            <a href="hw/proj5/index.html">
+              Project 5: Fun with Diffusion Models
+            </a>
+          </h3>
+          <img src="463_files/proj5_index.png" alt="Diffusion model examples" />
+          <p>
+            See student submissions <a href="hw/proj5/results.html">here</a>.
+          </p>
+          <div class="class-choice">
+            <img src="463_files/cup_gold.png" alt="Gold award" />
+            <strong>Class Choice Award: TBD!</strong>
+          </div>
+        </div> -->
+
+        <p>
+          See the homework <a href="./hw/submitting.html">submission specification</a>.
+        </p>
+      </section>
+
+      <section class="schedule-section">
+        <h2>Class Schedule</h2>
+
+        <p>Note that recordings will not be made of lectures this year, though lecture slides will be posted each class.</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-cell table-cell-right-border" style="width: 10%">
+                  Class Date
+                </th>
+                <th class="table-header-cell" style="width: 35%">
+                  Topics
+                </th>
+                <th class="table-header-cell table-cell-left-border" style="width: 55%">
+                  Material
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr class="table-row-border">
+                <td class="table-cell table-cell-right-border text-center">
+                  Aug 28
+                </td>
+                <td class="table-cell">
+                  <strong>Introduction</strong><br />
+                  <img src="./463_files/image006.jpg" alt="Introduction lecture" style="max-width: 262px; height: 175px;" />
+                </td>
+                <td class="table-cell table-cell-left-border">
+                  <ul>
+                    <li>
+                      Slides:
+                      <a href="./coming-soon.html">pptx</a>,
+                      <a href="./coming-soon.html">pdf</a>
+                    </li>
+                    <li>
+                      <a href="https://medium.com/@aaronhertzmann/how-photography-became-an-art-form-7b74da777c63">
+                        How Photography Became an Art Form
+                      </a>
+                      by
+                      <a href="https://www.dgp.toronto.edu/~hertzman/">
+                        Aaron Hertzmann
+                      </a>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+
+              <tr class="table-row-border">
+                <td class="table-cell table-cell-right-border text-center">
+                  Sep 02
+                </td>
+                <td class="table-cell">
+                  <strong>The Camera</strong><br />
+                  <img src="./463_files/image011.png" alt="Camera lecture" style="max-width: 262px; height: 175px;" />
+                </td>
+                <td class="table-cell table-cell-left-border">
+                  <ul>
+                    <li>
+                      Slides:
+                      <a href="./coming-soon.html">pptx</a>,
+                      <a href="./coming-soon.html">pdf</a>
+                    </li>
+                    <li>
+                      <a href="https://www.youtube.com/watch?v=F5WA26W4JaM">Perspective Projection in 5 minutes</a>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+
+              <tr class="table-row-border">
+                <td class="table-cell table-cell-right-border text-center">
+                  Sep 04
+                </td>
+                <td class="table-cell">
+                  <strong>Capturing Light... In human and machine</strong><br />
+                  <img src="./463_files/image022.gif" alt="Capturing Light lecture" style="max-width: 262px; height: 175px;" />
+                </td>
+                <td class="table-cell table-cell-left-border">
+                  <ul>
+                    <li>
+                      Slides:
+                      <a href="./coming-soon.html">pptx</a>,
+                      <a href="./coming-soon.html">pdf</a>
+                    </li>
+                    <li>
+                      <a href="https://youtu.be/6tTNgvAl1y4">Color in 5 minutes</a>
+                    </li>
+                    <li>
+                      <a href="https://youtu.be/1albYPL9Cfg">Displays in 5 minutes</a>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Sep 09</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b><span class="font-helvetica">Image Processing I: Pixels and Images</span></b
+              ><br />
+              <img
+                src="./463_files/point_processing.png"
+                class="image"
+                alt="point-processing"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>Szeliski Ch. 2</li>
+                <li>
+                  Images in 5 minutes:
+                  <a href="https://www.youtube.com/watch?v=xUzhKqf22mY"
+                    >The Case of the Splotched Van Gogh, Part 1</a
+                  >
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Sep 11</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Image Processing II: Convolution and Derivatives</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/convolution.png"
+                class="image"
+                alt="convolution"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>Szeliski Ch. 3</li>
+                <li>
+                  Image Filtering in 5 minutes:
+                  <a href="https://www.youtube.com/watch?v=6v8dNtknOSM&t=13s"
+                    >The Case of the Splotched Van Gogh, Part 2</a
+                  >
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Sep 16</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b><span class="font-helvetica">The Frequency Domain</span></b
+              ><br />
+              <img src="./463_files/fourier.png" class="image" alt="fourier" />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">ppt</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>Szeliski Ch 3.4</li>
+                <li>
+                  Fourier Transform in 5 minutes:
+                  <a href="https://www.youtube.com/watch?v=JciZYrh36LY"
+                    >The Case of the Splotched Van Gogh, Part 3</a
+                  >
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Sep 18</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Pyramid Blending, Templates, NL Filters</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/image033.gif"
+                class="image"
+                alt="pyramids-blending"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>Szeliski Ch 3.3, 3.5</li>
+                <li>
+                  Burt and Adelson,
+                  <a href="http://persci.mit.edu/pub_pdfs/spline83.pdf"
+                    >A multiresolution spline with application to image
+                    mosaics</a
+                  >
+                  , ACM ToG, 1983
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr class="table-row-border">
+            <td
+            class="table-cell table-cell-right-border text-center"
+            style="width: 8%"
+            >
+            <span class="font-helvetica">Sep 23</span>
+          </td>
+          <td class="table-cell" style="width: 62%">
+            <b><span class="font-helvetica">Image Transformations</span></b
+              ><br />
+              <img
+              src="./463_files/image_transformation.png"
+              class="image"
+              alt="image-transformation"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>
+                    <a href="https://visionbook.mit.edu/homogeneous_coordinates.html#sec-image_wrapping"
+                      >Torralba Ch 38</a
+                    >
+                </li>
+                <li>
+                  <a href="https://youtu.be/AheaTd_l5Is?si=vMW_vxBcCPeAL-IB"
+                    >Affine transform in 5 minutes</a
+                  >
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Sep 25</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b><span class="font-helvetica">Homographies and Mosaics</span></b
+              ><br />
+              <img src="./463_files/mosaic.png" class="image" alt="mosaic" />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>Szeliski Ch 8</li>
+                <li>
+                  Reading:
+                  <a
+                    href="https://www.sccollege.edu/faculty/jisbell/english101/documents/lightofotherdays.doc"
+                    >Light of Other Days</a
+                  >
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Sep 30</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Automatic Image Alignment Part 1</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/feature_alignment.png"
+                class="image"
+                alt="Automatic Image Alignment Part 1"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 2</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Automatic Image Alignment Part 2</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/panoramas.png"
+                class="image"
+                alt="Automatic Image Alignment Part 2"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 7</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >3D Vision: Coordinate Spaces
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/3Dvision_intro.png"
+                class="image"
+                alt="3D Vision: Coordinate Spaces"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 9</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Stereopsis
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/stereo.png"
+                class="image"
+                alt="Stereopsis and Epipolar Geometry"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 14</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Epipolar Geometry and Calibration
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/epipolar.png"
+                class="image"
+                alt="Stereopsis and Epipolar Geometry"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 16</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Structure-from-Motion (SfM)
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/colmap.png"
+                class="image"
+                alt="Structure-from-Motion (SfM)"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 21</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Neural Radiance Fields 1
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/nerf.png"
+                class="image"
+                alt="Neural Radiance Fields 1"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>
+                    <a
+                    href="https://visionbook.mit.edu/nerf.html"
+                    >Radiance Fields</a>
+                </li>
+                <li>
+                    <a
+                    href="https://arxiv.org/pdf/2003.08934"
+                    >NeRF Paper</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 28</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Neural Radiance Fields 2
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/nerf.png"
+                class="image"
+                alt="Neural Radiance Fields 1"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>
+                    <a
+                    href="https://visionbook.mit.edu/nerf.html"
+                    >Radiance Fields</a>
+                </li>
+                <li>
+                    <a
+                    href="https://arxiv.org/pdf/2003.08934"
+                    >NeRF Paper</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 30</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Neural Radiance Fields 3
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/nerf.png"
+                class="image"
+                alt="Neural Radiance Fields 1"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>
+                    <a
+                    href="https://visionbook.mit.edu/nerf.html"
+                    >Radiance Fields</a>
+                </li>
+                <li>
+                    <a
+                    href="https://arxiv.org/pdf/2003.08934"
+                    >NeRF Paper</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 4</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Texture Models</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/visual_texture.png"
+                class="image"
+                alt="Texture Models"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>
+                    <a
+                    href="https://visionbook.mit.edu/textures.html"
+                    >Textures</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 6</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Image-to-Image Translation</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/deeplearning_texture.jpeg"
+                class="image"
+                alt="Image-to-Image Translation"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+        <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 13</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Generative Models of Images</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/imgen.png"
+                class="image"
+                alt="Generative Models of Images"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <!-- pptx, -->
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 18</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Flow Matching</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/imgen.png"
+                class="image"
+                alt="Flow Matching"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="https://drive.google.com/file/d/1HaYxWXVCcpkNLfJOFhx73L7NON2ijyzr/view?usp=sharing">key</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 20</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Diffusion Sampling</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/imgen.png"
+                class="image"
+                alt="Practicals of Flow Models"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="https://drive.google.com/file/d/1uQrdRiZdD4SdW6HXjrHDHgNhSHvt5kB3/view?usp=sharing">key</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 25</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Photography and Art
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/mordenart.png"
+                class="image"
+                alt="Photography and Art"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pdf</a>
+
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+<tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Dec 2</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Sequence Models for words and pixels</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/sequence_models.png"
+                class="image"
+                alt="Sequence Models for words and pixels"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Dec 4 </span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Research in Computer Vision</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/idea.jpg"
+                class="image"
+                alt="final"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <!--
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Sep 30</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Data-driven Methods: Faces</span
+                ></b
+              ><br />
+              <img src="./463_files/image037.jpg" class="image" alt="faces" />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a
+                    href="https://docs.google.com/presentation/d/1fWzLUKvCbHTkHr-wHNIi8MBf6pw4WdBc/edit?usp=sharing&ouid=107002579169347817696&rtpof=true&sd=true"
+                    >pptx</a
+                  >,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>
+                  Galton,
+                  <a
+                    href="https://galton.org/essays/1870-1879/galton-1878-nature-composite.pdf"
+                    >"Composite portraits made by combining those of many
+                    different persons into a single figure."</a
+                  >, Nature, 1878
+                </li>
+                <li>
+                  Rowland and Ferrett,
+                  <a
+                    href="https://inst.eecs.berkeley.edu/~cs194-26/fa18/Papers/BlanzVetter99.pdf"
+                    >"Manipulating Facial Appearance through Shape and Color"</a
+                  >, CG&A, 1995
+                </li>
+                Blanz and Vetter,
+                <a
+                  href="https://inst.eecs.berkeley.edu/~cs194-26/fa18/Papers/BlanzVetter99.pdf"
+                  >"A Morphable Model for the Synthesis of 3D Faces"</a
+                >, SIGGRAPH 1999
+                <li>
+                  Cootes, Edwards, and Taylor,
+                  <a
+                    href="https://inst.eecs.berkeley.edu/~cs194-26/fa18/Papers/eccv98_aam.pdf"
+                    >"Active Appearance Models"</a
+                  >, ECCV 1998
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 07</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b><span class="font-helvetica">The Camera</span></b
+              ><br />
+              <img
+                src="./463_files/the_camera.png"
+                class="image"
+                alt="the-camera"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+                <li>
+                  Perspective projection in 5 minutes:
+                  <a href="https://www.youtube.com/watch?v=F5WA26W4JaM"
+                    >Video</a
+                  >
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+         <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Oct 21</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Automatic Image Alignment Part 3</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/moremosaics.png"
+                class="image"
+                alt="Automatic Image Alignment Part 3"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 13</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >3D Modeling for a Single View
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/singleview.png"
+                class="image"
+                alt="Sequence Models for words and pixels"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>
+                  <a href="./coming-soon.html">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+
+          <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 25</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Multi-View Stereo, Neural Radiance Fields,and Data-driven 3D
+                  </span
+                ></b
+              ><br />
+              <img
+                src="./463_files/nerf.png"
+                class="image"
+                alt="Multi-View Stereo, Neural Radiance Fields,and Data-driven 3D"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./coming-soon.html">pptx</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="course-info-section">
+        <h2>Exams</h2>
+        <ul>
+          <li><strong>Midterm:</strong> TBD</li>
+          <li><strong>Final:</strong> TBD</li>
+        </ul>
+      </section>
+
+      <section class="course-info-section">
+        <h2>Textbook</h2>
+        <ul>
+          <li>
+            <a href="https://mitpress.mit.edu/9780262048972/foundations-of-computer-vision/">
+              Foundations of Computer Vision by Torralba, Isola, Freeman
+            </a>
+          </li>
+          <li>
+            <a href="http://szeliski.org/Book/">
+              2nd edition of Computer Vision textbook by Rick Szeliski
+            </a>
+          </li>
+          <li>
+            If you need a refresher of linear algebra, please see
+            <a href="https://www.youtube.com/playlist?list=PL49CF3715CB9EF31D">
+              Gilbert Strang's online class.
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="course-info-section">
+        <h2>Class Notes</h2>
+        <p>
+          The instructor is extremely grateful to a large number of researchers
+          for making their slides available for use in this course.
+          <a href="http://www.cs.washington.edu/homes/seitz/">Steve Seitz</a>
+          and
+          <a href="https://szeliski.org/">Rick Szeliski</a>
+          have been particularly kind in letting me use their wonderful lecture
+          notes. In addition, I would like to thank
+          <a href="http://www.debevec.org/">Paul Debevec</a>,
+          <a href="https://mitpress.mit.edu/author/stephen-e-palmer-2695/">
+            Stephen Palmer
+          </a>,
+          <a href="http://www.cs.cmu.edu/%7Eph/">Paul Heckbert</a>,
+          <a href="http://luthuli.cs.uiuc.edu/%7Edaf/">David Forsyth</a>,
+          <a href="http://www.cs.cornell.edu/%7Esrm/">Steve Marschner</a>
+          and others, as noted in the slides. The instructor gladly gives permission
+          to use and modify any of the slides for academic and research
+          purposes. However, please do also acknowledge the original sources
+          where appropriate.
+        </p>
+      </section>
+
+
+
+      <p>
+        <b><span class="font-helvetica">GRADING:</span></b>
+      </p>
+
+      <p><b><span class="font-helvetica">CS180:</span></b></p>
+      <ul>
+        <li class="font-helvetica">50% Programming Projects (5 in total)</li>
+        <li class="font-helvetica">20% Midterm</li>
+        <li class="font-helvetica">25% Final Exam (held during finals week)</li>
+        <li class="font-helvetica">5% Pop Attendance Quizzes</li>
+      </ul>
+
+      <p><b><span class="font-helvetica">CS280A:</span></b></p>
+      <ul>
+        <li class="font-helvetica">Projects bells and whistles are required</li>
+        <li class="font-helvetica">Different grading curve than CS180</li>
+      </ul>
+
+      <p>
+        <span class="font-helvetica">
+          The midterm and final exams are expected to be more challenging than the past offerings. We offer optional but highly encouraged discussion sessions to help prepare students for this.
+        </span>
+      </p>
+
+      <p>
+        <span class="font-helvetica">
+          Students will be allotted a total of 5 (five) late days per semester with each additional late day incurring a 10% penalty.
+        </span>
+      </p>
+
+      <p>
+        <span class="font-helvetica">
+          Quizzes are graded for completion only, and the worst score will be dropped.
+        </span>
+      </p>
+
+      <p>
+        <b><span class="font-helvetica">PROGRAMMING RESOURCES:</span></b
+        ><br />
+        <span class="font-helvetica">
+          Students will be encouraged to use Python (with either
+          scikit-image or opencv) as their primary computing platform. These
+          libraries offer tons of built-in image processing functions. Here is a
+          link to some
+          <a href="./programming.html">useful Python resources</a>
+          compiled for this class. We also have an interactive
+          <a href="./fft-tool.html">FFT tool</a>
+          for visualizing Fourier transforms.
+        </span>
+      </p>
+
+      <p>
+        <b
+          ><span class="font-helvetica"
+            >PREVIOUS OFFERINGS OF THIS COURSE:</span
+          ></b
+        ><br />
+        <span class="font-helvetica">
+          Previous offerings of this course can be found
+          <a href="https://cal-cs180.github.io/fa24/">here</a>.
+        </span>
+      </p>
+
+      <p>
+        <b
+          ><span class="font-helvetica"
+            >SIMILAR COURSES IN OTHER UNIVERSITIES:</span
+          ></b
+        >
+      </p>
+      <ul>
+        <li class="font-helvetica">
+          <a href="http://courses.engr.illinois.edu/cs498dh3/"
+            >Computational Photography</a
+          >
+          (Hoiem, UIUC)
+        </li>
+        <li class="font-helvetica">
+          <a href="http://www.cs.brown.edu/courses/csci1290/"
+            >Computational Photography</a
+          >
+          (Hays, Brown)
+        </li>
+        <li class="font-helvetica">
+          <a href="http://stellar.mit.edu/S/course/6/sp12/6.815/"
+            >Digital and Computational Photography</a
+          >
+          (Durand, MIT)
+        </li>
+        <li class="font-helvetica">
+          <a href="http://www.cs.washington.edu/education/courses/cse576/05sp/"
+            >Computer Vision</a
+          >
+          (Seitz &amp; Szeliski, UWashington)
+        </li>
+      </ul>
+
+    </main>
+    <script>
+      const courseInfo = document.querySelector('.course-info-section');
+      const classSchedule = document.querySelector('.schedule-section');
+      courseInfo.after(classSchedule);
+      const projects = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Programming Projects');
+      classSchedule.after(projects);
+      [...classSchedule.querySelectorAll('tbody tr')].slice(1).forEach((row) => row.remove());
+
+      const projectItems = [...projects.querySelectorAll(':scope > .project-item')];
+      const nerfProject = projectItems.find((item) => item.textContent.includes('Neural Radiance Field'));
+      const stitchingProject = projectItems.find((item) => item.textContent.includes('(Auto)stitching'));
+      const diffusionProject = projectItems.find((item) => item.textContent.includes('Diffusion Models'));
+      nerfProject.remove();
+      diffusionProject.querySelector('a').textContent = 'Project 3: Fun with Diffusion Models';
+      stitchingProject.querySelector('a').textContent = 'Project 4: (Auto)stitching and Photo Mosaics';
+      stitchingProject.before(diffusionProject);
+
+      const finalProject = document.createElement('div');
+      finalProject.className = 'project-item';
+      finalProject.innerHTML = '<h3><a href="./projects-coming-soon.html">Final Project</a></h3><p>Details coming soon.</p>';
+      projects.appendChild(finalProject);
+      const submissionNote = [...projects.querySelectorAll('p')].find((paragraph) => paragraph.textContent.includes('submission specification'));
+      projects.appendChild(submissionNote);
+      projects.querySelectorAll('a').forEach((link) => { link.href = './projects-coming-soon.html'; });
+
+      const discussions = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Discussions');
+      const topicsTable = discussions.querySelectorAll('table')[1];
+      [...topicsTable.querySelectorAll('tbody')].slice(1).forEach((body) => body.remove());
+
+      const courseDescription = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Course Description');
+      const exams = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Exams');
+      const gradingTitle = [...document.querySelectorAll('p')].find((paragraph) => paragraph.textContent.trim() === 'GRADING:');
+      let gradingNode = gradingTitle;
+      while (gradingNode) {
+        const nextNode = gradingNode.nextElementSibling;
+        courseDescription.appendChild(gradingNode);
+        gradingNode = nextNode;
+      }
+      ['Textbook', 'Class Notes'].forEach((title) => {
+        const section = [...document.querySelectorAll('section')].find((item) => item.querySelector('h2')?.textContent.trim() === title);
+        [...section.children].forEach((child) => courseDescription.appendChild(child));
+        section.remove();
+      });
+      courseDescription.querySelector('h2').textContent = 'Course Description and Exams';
+      [...exams.children].slice(1).forEach((child) => courseDescription.appendChild(child));
+      exams.remove();
+
+      const sectionNames = ['Course Information', 'Course Description and Exams', 'Office Hours', 'Prerequisites', 'Discussions'];
+      const sections = sectionNames.map((name) =>
+        [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === name)
+      );
+      const captionBar = document.createElement('nav');
+      captionBar.className = 'section-captions';
+      captionBar.setAttribute('aria-label', 'Course sections');
+
+      sectionNames.forEach((name, index) => {
+        const link = document.createElement('a');
+        const id = `section-${index}`;
+        sections[index].id = id;
+        link.href = `#${id}`;
+        link.textContent = name === 'Discussions' ? 'Discussions & Topics' : name;
+        captionBar.appendChild(link);
+      });
+      if (!window.location.hash) window.scrollTo(0, 0);
+      classSchedule.after(captionBar);
+      document.querySelector('main').prepend(captionBar);
+    </script>
+  </body>
+</html>

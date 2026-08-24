@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Draw + 2D FFT Demo (with Upload)</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 24px;
+            display: grid;
+            gap: 16px;
+            place-items: start;
+            background: Canvas;
+            color: CanvasText;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            margin: 0 0 8px;
+        }
+
+        .wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .panel {
+            display: grid;
+            gap: 8px;
+        }
+
+        .card {
+            border: 1px solid color-mix(in oklab, CanvasText 15%, Canvas);
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 4px 16px color-mix(in oklab, CanvasText 8%, transparent);
+        }
+
+        canvas {
+            background: #111;
+            border-radius: 8px;
+            touch-action: none;
+            aspect-ratio: 1/1;
+            width: 100%;
+            image-rendering: pixelated;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button,
+        input[type=range] {
+            font: inherit;
+        }
+
+        .small {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .uploader {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drop-hint {
+            border: 1px dashed color-mix(in oklab, CanvasText 35%, transparent);
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: .9rem;
+            opacity: .8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="panel card">
+            <h1>Draw here</h1>
+            <canvas id="draw" width="256" height="256" aria-label="Drawing canvas"></canvas>
+            <div class="row">
+                <label>Brush: <input id="brush" type="range" min="1" max="40" value="12" /></label>
+                <button id="clear">Clear</button>
+                <label><input id="live" type="checkbox" checked /> Live FFT</label>
+                <button id="update">Update FFT</button>
+            </div>
+            <div class="row">
+                <div class="uploader">
+                    <input id="file" type="file" accept="image/*" />
+                    Examples:
+                    <button id="loadSquare">Square</button>
+                    <button id="loadRectangle">Rectangle</button>
+                    <button id="loadCircle">Circle</button>
+                    <button id="loadCross">Cross</button>
+                </div>
+            </div>
+            <div class="small">Tip: click/drag (or touch) to draw. Use the brush slider to change thickness. You can
+                also drop/paste an image onto the canvas.</div>
+        </div>
+
+        <div class="panel card">
+            <h1>FFT magnitude (log‑scaled)</h1>
+            <canvas id="fft" width="256" height="256" aria-label="FFT canvas"></canvas>
+            <div class="small">This shows the centered spectrum of your drawing or uploaded image. Bright pixels =
+                stronger frequencies.</div>
+        </div>
+    </div>
+
+    <script>
+        // === Complex number helpers ===
+        class Complex { constructor(re = 0, im = 0) { this.re = re; this.im = im; } }
+        function cAdd(a, b) { return new Complex(a.re + b.re, a.im + b.im); }
+        function cSub(a, b) { return new Complex(a.re - b.re, a.im - b.im); }
+        function cMul(a, b) { return new Complex(a.re * b.re - a.im * b.im, a.re * b.im + a.im * b.re); }
+
+        // === 1D FFT (recursive Cooley–Tukey, radix-2) ===
+        function fft1d(signal) {
+            const N = signal.length;
+            if (N === 1) return [new Complex(signal[0].re, signal[0].im)];
+            if ((N & (N - 1)) !== 0) throw new Error('Length must be power of two');
+            const even = new Array(N / 2), odd = new Array(N / 2);
+            for (let i = 0; i < N / 2; i++) { even[i] = signal[2 * i]; odd[i] = signal[2 * i + 1]; }
+            const Fe = fft1d(even), Fo = fft1d(odd);
+            const out = new Array(N);
+            for (let k = 0; k < N / 2; k++) {
+                const t = twiddle(k, N);
+                const v = cMul(t, Fo[k]);
+                out[k] = cAdd(Fe[k], v);
+                out[k + N / 2] = cSub(Fe[k], v);
+            }
+            return out;
+        }
+        const twiddleCache = new Map();
+        function twiddle(k, N) {
+            const key = N + ',' + k;
+            let t = twiddleCache.get(key);
+            if (t) return t;
+            const ang = -2 * Math.PI * k / N;
+            t = new Complex(Math.cos(ang), Math.sin(ang));
+            twiddleCache.set(key, t);
+            return t;
+        }
+
+        // === 2D FFT: apply 1D FFT on rows then columns ===
+        function fft2d(matrix) {
+            const H = matrix.length, W = matrix[0].length;
+            // rows
+            const rowFFT = new Array(H);
+            for (let y = 0; y < H; y++) {
+                const row = new Array(W);
+                for (let x = 0; x < W; x++) row[x] = new Complex(matrix[y][x], 0);
+                rowFFT[y] = fft1d(row);
+            }
+            // columns
+            const out = Array.from({ length: H }, () => Array(W));
+            for (let x = 0; x < W; x++) {
+                const col = new Array(H);
+                for (let y = 0; y < H; y++) col[y] = rowFFT[y][x];
+                const Fcol = fft1d(col);
+                for (let y = 0; y < H; y++) out[y][x] = Fcol[y];
+            }
+            return out;
+        }
+
+        function magnitude2d(F) {
+            const H = F.length, W = F[0].length;
+            const mag = Array.from({ length: H }, () => Array(W).fill(0));
+            let maxMag = 1e-12;
+            for (let y = 0; y < H; y++) {
+                for (let x = 0; x < W; x++) {
+                    const c = F[y][x];
+                    const m = Math.hypot(c.re, c.im);
+                    mag[y][x] = m;
+                    if (m > maxMag) maxMag = m;
+                }
+            }
+            // log scale and normalize
+            const logMax = Math.log(1 + maxMag);
+            for (let y = 0; y < H; y++) {
+                for (let x = 0; x < W; x++) {
+                    mag[y][x] = Math.log(1 + mag[y][x]) / logMax;
+                }
+            }
+            return mag;
+        }
+
+        function fftShift(img) {
+            const H = img.length, W = img[0].length;
+            const out = Array.from({ length: H }, () => Array(W));
+            const h2 = Math.floor(H / 2), w2 = Math.floor(W / 2);
+            for (let y = 0; y < H; y++) {
+                for (let x = 0; x < W; x++) {
+                    const yy = (y + h2) % H, xx = (x + w2) % W; // shift quadrants
+                    out[y][x] = img[yy][xx];
+                }
+            }
+            return out;
+        }
+
+        // === Drawing + Upload setup ===
+        const drawCanvas = document.getElementById('draw');
+        const drawCtx = drawCanvas.getContext('2d');
+        const fftCanvas = document.getElementById('fft');
+        const fftCtx = fftCanvas.getContext('2d');
+        const brush = document.getElementById('brush');
+        const clearBtn = document.getElementById('clear');
+        const updateBtn = document.getElementById('update');
+        const liveCb = document.getElementById('live');
+        const fileInput = document.getElementById('file');
+        const loadCrossBtn = document.getElementById('loadCross');
+        const loadSquareBtn = document.getElementById('loadSquare');
+        const loadCircleBtn = document.getElementById('loadCircle');
+        const loadRectangleBtn = document.getElementById('loadRectangle');
+
+        // Init drawing surface
+        function resetDrawing() {
+            drawCtx.fillStyle = '#000';
+            drawCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height);
+            drawCtx.strokeStyle = '#fff';
+            drawCtx.lineCap = 'round';
+            drawCtx.lineJoin = 'round';
+            drawCtx.lineWidth = +brush.value;
+        }
+        resetDrawing();
+
+        let drawing = false, last = null, rafPending = false;
+        function getPos(e) {
+            const rect = drawCanvas.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            const scaleX = drawCanvas.width / rect.width;
+            const scaleY = drawCanvas.height / rect.height;
+            return { x: x * scaleX, y: y * scaleY };
+        }
+        function lineTo(p) {
+            drawCtx.beginPath();
+            drawCtx.moveTo(last.x, last.y);
+            drawCtx.lineTo(p.x, p.y);
+            drawCtx.stroke();
+            last = p;
+        }
+
+        function start(e) { drawing = true; last = getPos(e); e.preventDefault(); }
+        function move(e) { if (!drawing) return; lineTo(getPos(e)); if (liveCb.checked) scheduleFFT(); e.preventDefault(); }
+        function end() { drawing = false; last = null; if (liveCb.checked) scheduleFFT(); }
+
+        ['mousedown', 'touchstart'].forEach(ev => drawCanvas.addEventListener(ev, start, { passive: false }));
+        ['mousemove', 'touchmove'].forEach(ev => drawCanvas.addEventListener(ev, move, { passive: false }));
+        ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(ev => drawCanvas.addEventListener(ev, end));
+
+        brush.addEventListener('input', () => { drawCtx.lineWidth = +brush.value; });
+        clearBtn.addEventListener('click', () => { resetDrawing(); renderFFT(); });
+        updateBtn.addEventListener('click', () => { renderFFT(); });
+
+        function scheduleFFT() {
+            if (rafPending) return; // throttle to animation frame
+            rafPending = true;
+            requestAnimationFrame(() => { rafPending = false; renderFFT(); });
+        }
+
+        // === Upload / Drop / Paste ===
+        fileInput.addEventListener('change', async (e) => {
+            const f = e.target.files && e.target.files[0];
+            if (!f) return;
+            const img = await readFileAsImage(f).catch(console.error);
+            if (img) drawImageIntoCanvas(img);
+        });
+
+        // Drag & drop directly onto the drawing canvas
+        ;['dragenter', 'dragover'].forEach(ev => drawCanvas.addEventListener(ev, (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }));
+        drawCanvas.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            const f = e.dataTransfer.files && e.dataTransfer.files[0];
+            if (!f) return;
+            const img = await readFileAsImage(f).catch(console.error);
+            if (img) drawImageIntoCanvas(img);
+        });
+
+        // Paste from clipboard (Cmd/Ctrl+V)
+        document.addEventListener('paste', async (e) => {
+            const items = e.clipboardData && e.clipboardData.items;
+            if (!items) return;
+            for (const it of items) {
+                if (it.type.startsWith('image/')) {
+                    const f = it.getAsFile();
+                    const img = await readFileAsImage(f).catch(console.error);
+                    if (img) drawImageIntoCanvas(img);
+                    break;
+                }
+            }
+        });
+
+        // Simple demo loader (a white X)
+        loadCrossBtn.addEventListener('click', () => {
+            resetDrawing();
+            drawCtx.strokeStyle = '#fff';
+            drawCtx.lineWidth = 24;
+            drawCtx.beginPath();
+            drawCtx.moveTo(32, 32); drawCtx.lineTo(224, 224);
+            drawCtx.moveTo(224, 32); drawCtx.lineTo(32, 224);
+            drawCtx.stroke();
+            renderFFT();
+        });
+
+        loadCircleBtn.addEventListener('click', () => {
+            resetDrawing();
+            drawCtx.fillStyle = '#fff';
+            drawCtx.beginPath();
+            drawCtx.arc(128, 128, 80, 0, 2 * Math.PI);
+            drawCtx.fill();
+            renderFFT();
+        });
+
+        loadSquareBtn.addEventListener('click', () => {
+            resetDrawing();
+            drawCtx.fillStyle = '#fff';
+            drawCtx.fillRect(64, 64, 128, 128);
+            renderFFT();
+        });
+
+        loadRectangleBtn.addEventListener('click', () => {
+            resetDrawing();
+            drawCtx.fillStyle = '#fff';
+            drawCtx.fillRect(48, 80, 160, 96);
+            renderFFT();
+        });
+
+        function readFileAsImage(file) {
+            return new Promise((resolve, reject) => {
+                const fr = new FileReader();
+                fr.onerror = () => reject(fr.error);
+                fr.onload = () => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = (e) => reject(e);
+                    img.src = fr.result;
+                };
+                fr.readAsDataURL(file);
+            });
+        }
+
+        function drawImageIntoCanvas(img) {
+            const cw = drawCanvas.width, ch = drawCanvas.height;
+            // clear to black background
+            drawCtx.save();
+            drawCtx.setTransform(1, 0, 0, 1, 0, 0);
+            drawCtx.fillStyle = '#000';
+            drawCtx.fillRect(0, 0, cw, ch);
+            drawCtx.restore();
+
+            const iw = img.naturalWidth || img.width;
+            const ih = img.naturalHeight || img.height;
+
+            let dx = 0, dy = 0, dw = cw, dh = ch, sx = 0, sy = 0, sw = iw, sh = ih;
+
+            const s = Math.min(cw / iw, ch / ih);
+            dw = Math.max(1, Math.round(iw * s));
+            dh = Math.max(1, Math.round(ih * s));
+            dx = Math.floor((cw - dw) / 2);
+            dy = Math.floor((ch - dh) / 2);
+            drawCtx.drawImage(img, dx, dy, dw, dh);
+
+            if (liveCb.checked) scheduleFFT(); else renderFFT();
+        }
+
+        // === FFT rendering ===
+        const SIZE = 128; // downsample to this power-of-two size for speed
+        const tmp = document.createElement('canvas');
+        Object.assign(tmp, { width: SIZE, height: SIZE });
+        const tmpCtx = tmp.getContext('2d');
+
+        function renderFFT() {
+            // downsample drawing to SIZE x SIZE grayscale
+            tmpCtx.drawImage(drawCanvas, 0, 0, SIZE, SIZE);
+            const img = tmpCtx.getImageData(0, 0, SIZE, SIZE);
+            const g = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+            for (let y = 0; y < SIZE; y++) {
+                for (let x = 0; x < SIZE; x++) {
+                    const i = (y * SIZE + x) * 4;
+                    const r = img.data[i], gg = img.data[i + 1], b = img.data[i + 2];
+                    // luminance 0..1; invert so white strokes (255) -> high values
+                    const lum = (0.2126 * r + 0.7152 * gg + 0.0722 * b) / 255;
+                    g[y][x] = lum;
+                }
+            }
+            // compute 2D FFT magnitude
+            const F = fft2d(g);
+            let mag = magnitude2d(F);
+            mag = fftShift(mag);
+            // draw to fft canvas (scale up to fit)
+            const out = fftCtx.createImageData(SIZE, SIZE);
+            for (let y = 0; y < SIZE; y++) {
+                for (let x = 0; x < SIZE; x++) {
+                    const v = Math.max(0, Math.min(1, mag[y][x]));
+                    const c = Math.round(v * 255);
+                    const i = (y * SIZE + x) * 4;
+                    out.data[i] = out.data[i + 1] = out.data[i + 2] = c;
+                    out.data[i + 3] = 255;
+                }
+            }
+            // putImageData to a small offscreen, then scale to visible canvas
+            const off = document.createElement('canvas');
+            off.width = SIZE; off.height = SIZE;
+            off.getContext('2d').putImageData(out, 0, 0);
+            fftCtx.imageSmoothingEnabled = false;
+            fftCtx.clearRect(0, 0, fftCanvas.width, fftCanvas.height);
+            fftCtx.drawImage(off, 0, 0, fftCanvas.width, fftCanvas.height);
+        }
+
+        // initial render
+        renderFFT();
+    </script>
+</body>
+
+</html>

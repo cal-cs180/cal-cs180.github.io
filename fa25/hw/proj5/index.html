@@ -1,0 +1,579 @@
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta property="og:image" content="https://cal-cs180.github.io/fa24/hw/proj5/assets/walrus_preview.png">
+    <meta name="twitter:image" content="https://cal-cs180.github.io/fa24/hw/proj5/assets/walrus_preview.png">
+
+
+
+    <title>CS180: Intro to Computer Vision and Computational Photography</title>
+    
+    <link rel="StyleSheet" href="../style.css" type="text/css" media="all" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+
+    <script>
+      hljs.initHighlightingOnLoad();
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+          }
+        };
+      </script>
+
+    <script>
+      hljs.initHighlightingOnLoad();
+    </script>
+        
+    <style>
+      code {
+            background-color: #f4f4f4;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+        .image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.image-container > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+  max-width: 200px;
+}
+
+.image-container img {
+  width: 100%;
+  height: auto;
+}
+
+.image-container p {
+  text-align: center;
+  margin-top: 10px;
+}
+      /* Two image containers */
+      .column {
+        float: left;
+        width: 45%;
+        padding: 5px;
+      }
+
+      /* Clear floats after image containers */
+      .row::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+      code {
+            background-color: #f4f4f4;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.image-container > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+  max-width: 200px;
+}
+
+.image-container img {
+  width: 100%;
+  height: auto;
+}
+
+.image-container p {
+  text-align: center;
+  margin-top: 10px;
+}
+      /* Two image containers */
+      .column {
+        float: left;
+        width: 45%;
+        padding: 5px;
+      }
+
+      /* Clear floats after image containers */
+      .row::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+      code {
+            background-color: #f4f4f4;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+        .image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.image-container > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40%;
+  max-width: 200px;
+  position: relative;
+  padding: 20px;
+  overflow: visible;
+}
+
+.image-container img {
+  width: 100%;
+  height: auto;
+  transform-origin: center center;
+}
+
+.image-container p {
+  text-align: center;
+  margin-top: 10px;
+}
+      /* Two image containers */
+      .column {
+        float: left;
+        width: 45%;
+        padding: 5px;
+      }
+
+      /* Clear floats after image containers */
+      .row::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+
+      @keyframes rotate180 {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(180deg);
+        }
+      }
+      
+      .rotating-image {
+        transition: transform 1.5s;
+        transform: rotate(0deg);
+      }
+      
+      .rotating-image:hover {
+        transform: rotate(180deg);
+      }
+
+      .zoom-animation {
+        transition: transform 1s ease-in-out;
+        transform: scale(1);
+      }
+
+      .zoom-animation:hover,
+      .zoom-animation.active {
+        transform: scale(0.25);
+      }
+
+      .rotating-image {
+        transition: transform 1.5s;
+        transform: rotate(0deg);
+      }
+
+      .rotating-image:hover,
+      .rotating-image.active {
+        transform: rotate(180deg);
+      }
+
+      .caption-container {
+        position: relative;
+        height: auto;
+        min-height: 2em;
+        text-align: center;
+        width: 100%;
+        padding: 5px 0;
+      }
+
+      .caption-default, .caption-transform {
+        position: absolute;
+        width: 100%;
+        transition: opacity 1.5s;
+        white-space: normal;
+        left: 0;
+      }
+
+      .caption-transform {
+        opacity: 0;
+      }
+
+      .rotating-image:hover + .caption-container .caption-default,
+      .active + .caption-container .caption-default {
+        opacity: 0;
+      }
+
+      .rotating-image:hover + .caption-container .caption-transform,
+      .active + .caption-container .caption-transform {
+        opacity: 1;
+      }
+
+      .zoom-animation:hover + .caption-container .caption-default {
+        opacity: 0;
+      }
+
+      .zoom-animation:hover + .caption-container .caption-transform {
+        opacity: 1;
+      }
+
+      .image-container > div:hover .zoom-animation {
+        transform: scale(0.25);
+      }
+
+      .image-container > div:hover .caption-default {
+        opacity: 0;
+      }
+
+      .image-container > div:hover .caption-transform {
+        opacity: 1;
+      }
+
+      .caption-container .caption-default {
+        opacity: 1;
+        transition: opacity 1.5s;
+      }
+
+      .caption-container .caption-transform {
+        opacity: 0;
+        transition: opacity 1.5s;
+      }
+
+      .active + .caption-container .caption-default {
+        opacity: 0;
+      }
+
+      .active + .caption-container .caption-transform {
+        opacity: 1;
+      }
+
+      .dissolve-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 100%; /* Creates a square aspect ratio */
+        margin-bottom: 5px; /* Reduced from 10px to match other captions */
+      }
+
+      .dissolve-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 1s ease-in-out;
+      }
+
+      .dissolve-image.original {
+        opacity: 1;
+      }
+
+      .dissolve-image.edited {
+        opacity: 0;
+      }
+
+      .dissolve-image.original.active {
+        opacity: 0;
+      }
+
+      .dissolve-image.edited.active {
+        opacity: 1;
+      }
+
+      /* Ensure consistent caption styling */
+      .image-container > div p {
+        text-align: center;
+        margin-top: 5px;  /* Reduced from 10px to align with other captions */
+        margin-bottom: 0;
+      }
+
+      /* Hover state */
+      .dissolve-container:hover .dissolve-image.original {
+        opacity: 0;
+      }
+
+      .dissolve-container:hover .dissolve-image.edited {
+        opacity: 1;
+      }
+
+      h1 {
+      font-size: x-large;
+    }
+
+    h1 a {
+      font-size: medium;
+    }
+
+    h1 img {
+      float: left;
+      padding-right: 1em;
+    }
+    </style>
+  </head>
+  <body data-new-gr-c-s-check-loaded="14.1027.0" data-gr-ext-installed="">
+    <header>
+      <h1>
+        <a href="http://www.berkeley.edu/" style="text-decoration: none;">
+          <img
+            src="assets/ucbseal.png"
+            alt="berkeley logo"
+            height="75"
+            width="75"/>
+        </a>
+        Programming Project #5 (<code>proj5</code>)<br>
+        <a href="https://cal-cs180.github.io/fa25/">CS180: Intro to Computer Vision and Computational
+          Photography</a>
+        <br>
+        <a href="http://www.berkeley.edu/"
+                    >University of California, Berkeley</a
+                  >
+        
+      </h1>
+    </header>
+    <!-- <table>
+      <tr>
+        <td style="padding: 2.65pt" valign="top">
+          <a href="http://www.berkeley.edu/" style="text-decoration: none;">
+            <img
+              src="assets/ucbseal.png"
+              alt="berkeley logo"
+              height="75"
+              width="75"/>
+          </a>
+        </td>
+        <td style="padding: 2.65pt" valign="top">
+          <p>
+            <b>
+              <a href="../../index.html">
+                CS180: Intro to Computer Vision and Computational Photography
+              </a>
+            </b>
+            <br/>
+            <span>
+              <a href="http://www.cs.berkeley.edu/">Computer Science Division</a>
+              <br/>
+              <a href="http://www.berkeley.edu/">University of California Berkeley</a>
+            </span>
+          </p>
+        </td>
+      </tr>
+    </table> -->
+    <div class="image-container">
+      <div>
+        <div class="dissolve-container">
+          <img src="assets/hole_filling3.png" alt="Original Campanile"
+            class="dissolve-image original">
+          <img src="assets/hole_filling.png" alt="Hole Filled"
+            class="dissolve-image edited">
+        </div>
+        <p><b>Hole Filling</b></p>
+      </div>
+      <div>
+        <!-- <div class="dissolve-container">
+          <img src="assets/dog.png" alt="Original Dog"
+            class="dissolve-image original">
+          <img src="assets/sdedit_dog.png" alt="Edited Dog"
+            class="dissolve-image edited">
+        </div> -->
+        <div class="dissolve-container">
+          <img src="assets/pixel_bear.png" alt="Original Dog"
+            class="dissolve-image original">
+          <img src="assets/sdedit_bear2.png" alt="Edited Dog"
+            class="dissolve-image edited">
+        </div>
+        <p><b>"Make it Real"</b></p>
+      </div>
+      <div>
+        <img src="assets/skull2.png" alt="Man Wearing Hat"
+          class="zoom-animation">
+        <div class="caption-container">
+          <p class="caption-default"><b>A Lithograph of a Waterfall</b></p>
+          <p class="caption-transform"><b>A Lithograph of a Skull</b></p>
+        </div>
+      </div>
+      <div>
+        <img src="assets/old_man.png" alt="Bear Dancing" class="rotating-image">
+        <div class="caption-container">
+          <p class="caption-default"><b>An Oil Painting of an Old Man</b></p>
+          <p class="caption-transform"><b>An Oil Painting of People Around a
+            Fire</b></p>
+        </div>
+        
+      </div>
+
+    </div>
+    
+    <!-- <p style="text-align: center; font-size: 0.5em; margin: 1px 0;">Hover Over Us!</p> -->
+
+    <video id="video5" width="640" height="320" muted 
+        style="display: block; margin-left: auto; margin-right: auto;"
+        onmouseover="handleMouseOver(this)" 
+        onmouseout="handleMouseOut(this)">
+        <source type="video/mp4" src="assets/mnist.mp4" />
+    </video>
+    </div>
+
+    <br />
+    <h1 style="text-align: center">Fun With Diffusion Models!</h1>
+    <h2 style="text-align: center">
+      <b style="color: #CC0000"><a href="parta.html" style="color: #CC0000 !important; text-decoration: underline !important;">Part A</a> Due: 11/25/2025 11:59pm (soft) (hard deadline: 12/12/2025 11:59pm)</b>
+      <br />
+      <b style="color: #CC0000"><a href="partb.html" style="color: #CC0000 !important; text-decoration: underline !important;">Part B</a> Due: 12/12/2025 11:59pm</b>
+    </h2>
+    <h3 style="text-align: center">
+      <b
+        >We recommend using GPUs from
+        <a href="https://colab.research.google.com/">Colab</a> to finish this
+        project!</b
+      >
+    </h3>
+
+    <h2>Overview</h2>
+    In this project you will implement and deploy diffusion models for image generation. It is divided into two parts
+    <b>with two separate due dates</b> (see below).
+    
+    <br>
+    <br>
+    <p style="color: #CC0000; display: inline;"><b>START EARLY!</b></p><span style="margin-left: 5px;"> This project, in many ways, will be the most difficult project this semester.</span>
+
+    <h2>Deliverables</h2>
+    There are several due dates:
+    <ol>
+      <li>
+        <b style="color: #CC0000">Nov. 25 2025</b>: Code and project webpage for
+        <a href="parta.html" style="color: #CC0000 !important; text-decoration: underline !important;">part A</a> should be completed by this date to stay on track. However, the Google Form and the bells and whistles can be submitted with part B.
+      </li>
+      <li>
+        <b style="color: #CC0000">Dec. 12 2025</b>: Code and project webpage for
+        <a href="partb.html" style="color: #CC0000 !important; text-decoration: underline !important;">part B</a> should be complete and
+        submitted to gradescope, along with any bells and whistles. Also please fill in the <a href="https://forms.gle/gLQhNCyBUaCACt7W6">Google Form</a> to share your website.
+      </li>
+    </ol>
+  </body>
+  <grammarly-desktop-integration
+    data-grammarly-shadow-root="true"
+  ></grammarly-desktop-integration>
+  <script>
+    window.addEventListener('load', function() {
+      // Handle video autoplay
+      var videos = document.querySelectorAll('video');
+      videos.forEach(function(video) {
+        video.playbackRate = 1; // Slows down the video to approximately 1.5x longer duration
+        video.play();
+        
+        // Add timeout to reverse video after 2 seconds
+        setTimeout(() => {
+          playInReverse(video);
+        }, 2000);
+      });
+  
+      // Handle animations
+      const zoomEls = document.querySelectorAll('.zoom-animation');
+      const rotateEls = document.querySelectorAll('.rotating-image');
+      const dissolveOriginals = document.querySelectorAll('.dissolve-image.original');
+      const dissolveEditeds = document.querySelectorAll('.dissolve-image.edited');
+      
+      // Add active class to trigger animations
+      zoomEls.forEach(el => el.classList.add('active'));
+      rotateEls.forEach(el => el.classList.add('active'));
+      dissolveOriginals.forEach(el => el.classList.add('active'));
+      dissolveEditeds.forEach(el => el.classList.add('active'));
+      
+      // Remove active class after 2 seconds
+      setTimeout(() => {
+        zoomEls.forEach(el => el.classList.remove('active'));
+        rotateEls.forEach(el => el.classList.remove('active'));
+        dissolveOriginals.forEach(el => el.classList.remove('active'));
+        dissolveEditeds.forEach(el => el.classList.remove('active'));
+      }, 2000);
+    });
+  </script>
+  <script>
+    let isReversing = false;
+
+    function handleMouseOver(video) {
+        // Stop any reverse playback
+        isReversing = false;
+        // Ensure video plays forward from current position
+        video.playbackRate = 1;
+        video.play().catch(e => console.log("Play failed:", e));
+    }
+
+    function handleMouseOut(video) {
+        playInReverse(video);
+    }
+
+    function playInReverse(video) {
+        isReversing = true;
+        const fps = 30;
+        const interval = 1000 / fps;
+        const step = 0.028;
+        
+        function decreaseTime() {
+            if (!isReversing || video.currentTime <= 0) {
+                isReversing = false;
+                video.pause();
+                return;
+            }
+            video.currentTime = Math.max(0, video.currentTime - step);
+            setTimeout(decreaseTime, interval);
+        }
+        
+        video.pause();
+        decreaseTime();
+    }
+  </script>
+
+<div style="text-align: center;">
+  <img src="assets/walrus_preview.png" alt="Walrus Preview" style="width: 500px;" />
+  <p>Anagram created by <a href="https://jingzhi-su.github.io/cs180-proj5/">Stephen Su</a></p>
+</div>
+
+<h3>Acknowledgements</h3>
+<p>This project was a joint effort by <a
+    href="https://dangeng.github.io/">Daniel Geng</a>, <a
+    href="https://ryantabrizi.com/">Ryan Tabrizi</a>, and <a
+    href="https://hangg7.com/">Hang Gao</a>, advised by <a
+    href="https://liyueshen.engin.umich.edu/">Liyue Shen</a>, <a
+    href="https://andrewowens.com/">Andrew Owens</a>, and <a
+    href="https://people.eecs.berkeley.edu/~efros/">Alexei
+    Efros</a>. </p>
+</html>

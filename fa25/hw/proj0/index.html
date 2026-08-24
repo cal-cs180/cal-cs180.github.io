@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>CS180: Project 0</title>
+  <style>
+    body {
+      background: white;
+      color: black;
+    }
+
+    h1 {
+      font-size: x-large;
+    }
+
+    h1 a {
+      font-size: medium;
+    }
+
+    h1 img {
+      float: left;
+      padding-right: 1em;
+    }
+
+    h2 {
+      font-size: x-large;
+      text-align: center;
+      font-variant: small-caps;
+    }
+
+    h2 b {
+      font-size: large;
+      font-variant: normal;
+      color: red;
+    }
+
+    h2 i {
+      font-size: large;
+      font-variant: normal;
+      font-style: italic;
+      font-weight: normal;
+    }
+
+    h3 {
+      font-size: large;
+      font-variant: small-caps;
+      margin: 1em 0 0 0;
+    }
+
+    p {
+      margin: 0 1em 0.5em 1em;
+    }
+
+    ul,
+    ol {
+      margin: 0.5em 0 0.5em 1em;
+    }
+
+    li {
+      margin: 0;
+    }
+
+    img.example {
+      display: block;
+      margin: 1em auto;
+      max-width: 90%;
+    }
+
+    iframe {
+      display: block;
+      margin: 1em auto;
+      max-width: 90%;
+    }
+
+    code {
+      background: #f0f0f0;
+      padding: 0.1em 0.2em;
+      border-radius: 3px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>
+      <img src="ucbseal_139_540.png" alt="berkeley logo"
+        height="75" width="75">
+      Programming Project #0 (<code>proj0</code>)<br>
+      <a href="../../">CS180: Intro to Computer Vision and Computational
+        Photography</a>
+    </h1>
+  </header>
+  <h2>
+    Becoming Friends with Your Camera<br>
+    <b style="color:#9E0000">Due Date: Tuesday, September 2nd, 2025 at 11:59PM</b>
+  </h2>
+  
+  <h3>Overview</h3>
+  <p>
+    In this class, we want you to <i>become friends with every pixel.</i> The first step toward this goal is to become friends with your camera—e.g., the one in your smartphone. In particular, the goal of this project is to get you some intuitive understanding of the somewhat subtle relationship between perspective, focal length/zoom, and the center of projection. Don't worry if these terms aren't familiar to you yet. For now, your task is to just take some photos with your camera, as described below:
+  </p>
+
+  <h3>Part 1: Selfie: The Wrong Way vs. The Right Way</h3>
+  <p>
+    Take a picture of your friend (or yourself) from close up. You get a typical distorted selfie image. Now step back several feet from your subject, zoom in, and take a second picture. Try to get the face in the second photo to be the same size as in the first photo. If you've done things right, the second portrait should look much better than the first one. <strong>Think about why this is.</strong>
+  </p>
+  <img src="selfie.png" alt="Close portrait comparison" class="example" />
+
+  <h3>Part 2: Architectural Perspective Compression</h3>
+  <p>
+    Let's repeat the same procedure in reverse, for an urban scene. Pick a nice view down a long street (or a walking path on campus), zoom in, and take a photo. Now, walk down the street in the direction of your first shot, and take a second photo without zoom, such that the scene in the two photos appears approximately the same size. The first picture should look flattened, or compressed, compared to the second. <strong>Again, think about why.</strong>
+  </p>
+
+  <h3>Part 3: The Dolly Zoom</h3>
+  <p>
+    In this part, we will be duplicating a classic film effect called the <a href="https://en.wikipedia.org/wiki/Dolly_zoom" target="_blank">dolly zoom</a>. It is a camera movement also known as the "Vertigo shot", after a famous scene in Hitchcock's Vertigo. Here are some examples of this effect in cinema:
+  </p>
+  <iframe
+    title="Dolly Zoom examples"
+    width="560"
+    height="315"
+    src="https://www.youtube.com/embed/_OO3pqJVLAc"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+  <p>
+    The idea is to simultaneously move the camera back while also zooming in. First, come up with a good setting for the shot (e.g., a scene with stuffed animals is one popular choice). Now take a few (4-8 or even more!) still photos while you move the camera back and zoom in, keeping the resulting image roughly the same size. Combine your stills into an animated GIF file—you have a dolly zoom!
+  </p>
+
+  <h3>Deliverables & Submission</h3>
+  <p>
+    For this project, you must submit your project webpage. 
+    <strong>Take beautiful photos. Make your webpage visually appealing. Aesthetics matter!</strong>
+  </p>
+  <ol>
+    <li>
+      <strong>Host your webpage online.</strong> We recommend using GitHub Pages (<a href="../gh-pages.html">tutorial</a>), but any hosting service is acceptable. You may organize your project in any directory structure you prefer.
+    </li>
+    <li>
+      <strong>Submit your webpage URL to the class gallery.</strong>
+      <br>Google Form: <a href="https://forms.gle/55acn3qyebLK6qwN7" target="_blank">https://forms.gle/55acn3qyebLK6qwN7</a>
+    </li>
+    <li>
+      <strong>Submit a PDF version to <a href="https://www.gradescope.com" target="_blank">Gradescope</a></strong> (Entry code: <strong>VWX283</strong>)
+      <br>Print your webpage as a PDF <u>with the URL in the header</u> (see image below for the "Headers and footers" option). This serves as a reference for grading and ensures your submission remains unchanged after the deadline.
+      <br><img src="../assets/pdf_header_option.jpg" alt="PDF print settings showing Headers and footers option" style="max-width: 300px; margin: 10px 0;">
+    </li>
+  </ol>
+
+  <br>
+  <br>
+</body>
+
+</html>

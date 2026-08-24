@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>CS180: Project 1</title>
+  <style>
+    body {
+      background: white;
+      color: black;
+    }
+
+    h1 {
+      font-size: x-large;
+    }
+
+    h1 a {
+      font-size: medium;
+    }
+
+    h1 img {
+      float: left;
+      padding-right: 1em;
+    }
+
+    h2 {
+      font-size: x-large;
+      text-align: center;
+      font-variant: small-caps;
+    }
+
+    h2 b {
+      font-size: large;
+      font-variant: normal;
+      color: red;
+    }
+
+    h2 i {
+      font-size: large;
+      font-variant: normal;
+      font-style: italic;
+      font-weight: normal;
+    }
+
+    h3 {
+      font-size: large;
+      font-variant: small-caps;
+      margin: 1em 0 0 0;
+    }
+
+    /* Ensure h5 is at least as large as paragraph text */
+    h5 {
+      font-size: 1em;
+    }
+
+    p {
+      margin: 0 1em 0.5em 1em;
+    }
+
+    ul,
+    ol {
+      margin: 0.5em 0 0.5em 1em;
+    }
+
+    li {
+      margin: 0;
+    }
+
+    /* Rubric layout styles (scoped to this page) */
+    .rubric {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .rubric-col {
+      width: 48%;
+      min-width: 320px;
+    }
+
+    .rubric-indent {
+      margin-left: 0.5rem;
+    }
+
+    .rubric-note {
+      font-size: 0.95em;
+    }
+
+    .rubric h5 {
+      margin: 0.25em 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>
+      <img src="./proj1_files/ucbseal_139_540.png" alt="berkeley logo" height="75" width="75">
+      Programming Project #1 (<code>proj1</code>)<br>
+      <!-- TODO: Update fa24 to fa25 when URLs are ready -->
+      <a href="../../">CS180: Intro to Computer Vision and Computational
+        Photography</a>
+    </h1>
+  </header>
+  <h2>
+    <img src="proj1_files/image001.jpg" alt="Red-Green-Blue Example"><br>
+    Images of the Russian Empire:<br>
+    <i>Colorizing the
+      <a href="https://www.loc.gov/collections/prokudin-gorskii/">Prokudin-Gorskii</a>
+      photo collection</i><br>
+    <b style="color:#9E0000">Due Date: September 12, 2025 at 11:59 PM</b>
+  </h2>
+  <h3>Background</h3>
+  <p>
+    <a href="http://en.wikipedia.org/wiki/Prokudin-Gorskii">Sergei Mikhailovich Prokudin-Gorskii</a>
+    (1863-1944) [Сергей
+    Михайлович
+    Прокудин-Горский,
+    to his Russian friends] was a man well ahead of his time. Convinced, as
+    early as 1907, that color photography was the wave of the future, he won
+    Tzar's special permission to travel across the vast Russian Empire and
+    take color photographs of everything he saw including the only color
+    portrait of
+    <a href="http://en.wikipedia.org/wiki/Leo_Tolstoy">Leo Tolstoy</a>. And he
+    really photographed everything: people, buildings, landscapes, railroads,
+    bridges... thousands of color pictures! His idea was simple: record three
+    exposures of every scene onto a glass plate using a red, a green, and a
+    blue filter. Never mind that there was no way to print color photographs
+    until much later -- he envisioned special projectors to be installed in
+    "multimedia" classrooms all across Russia where the children would be able
+    to learn about their vast country. Alas, his plans never materialized: he
+    left Russia in 1918, right after the revolution, never to return again.
+    Luckily, his RGB glass plate negatives, capturing the last years of the
+    Russian Empire, survived and were purchased in 1948 by the Library of
+    Congress. The LoC has recently digitized the negatives and made them
+    available on-line.
+  </p>
+  <h3>Overview</h3>
+  <p>
+    The goal of this assignment is to take the digitized Prokudin-Gorskii
+    glass plate images and, using image processing techniques, automatically
+    produce a color image with as few visual artifacts as possible. In order
+    to do this, you will need to extract the three color channel images, place
+    them on top of each other, and align them so that they form a single RGB
+    color image. <a href="http://www.loc.gov/exhibits/empire/making.html">This</a> is a cool explanation on how the
+    Library of Congress composed their
+    color images.
+  </p>
+  <p>
+    Some starter code is available in
+    <!-- TODO: Update fa24 to fa25 when URLs are ready -->
+    <a href="https://inst.eecs.berkeley.edu/~cs180/fa24/hw/proj1/data/colorize_skel.py">Python</a>; do not feel
+    obligated
+    to use it.
+    We will assume that a simple x,y translation model is sufficient for
+    proper alignment. However, the full-size glass plate images (i.e. <code>.tif</code> files) are very
+    large, so your alignment procedure will need to be relatively fast and
+    efficient.
+    When you begin your naive implementation, you should start with the smaller files
+    <code>monastery.jpg</code> and <code>cathedral.jpg</code> provided, or by downsizing the larger files.
+    Your submission should be ran on the full-size images.
+  </p>
+  <h3>Details</h3>
+  <img src="./proj1_files/image003.jpg" alt="example negative" style="float: right">
+  <p>
+    A few of the digitized glass plate images (both hi-res and low-res
+    versions) will be placed in the following zip file (note that the filter
+    order from top to bottom is BGR, not RGB!): <a href="https://drive.google.com/file/d/1XQUUR3R9qnVICT8I3hxd7cMxp5WfqkCA/view?usp=sharing" target="_blank">data.zip</a> (<a href="./gallery/" target="_blank">online gallery for preview</a>).
+
+    Your program will take a glass plate
+    image as input and produce a single color image as output. The program
+    should divide the image into three equal parts and align the second and
+    the third parts (e.x. G and R) to the first (B). For each image, you will need
+    to print the (x,y) displacement vector that was used to align the parts.
+  </p>
+  <p>
+    The easiest way to align the parts is to exhaustively search over a window
+    of possible displacements (say <code>[-15,15]</code> pixels), score each one using some
+    image matching metric, and take the displacement with the best score.
+    There is a number of possible metrics that one could use to score how well
+    the images match. The simplest one is just the L2 norm also known as the
+    <b>Euclidean Distance</b> which is simply
+    <code>sqrt(sum(sum((image1-image2).^2)))</code> where the sum is taken over the
+    pixel values. Another is <b>Normalized Cross-Correlation</b> (NCC), which is
+    simply a dot product between two normalized vectors: (<code>image1./||image1||</code>
+    and <code>image2./||image2||</code>).
+  </p>
+  
+  <p>
+    Exhaustive search will become prohibitively expensive if the pixel
+    displacement is too large (which will be the case for high-resolution
+    glass plate scans). In this case, you will need to implement a faster
+    search procedure such as an image pyramid. An image pyramid represents the
+    image at multiple scales (usually scaled by a factor of 2) and the
+    processing is done sequentially starting from the coarsest scale (smallest
+    image) and going down the pyramid, updating your estimate as you go. It is
+    very easy to implement by adding recursive calls to your original
+    single-scale implementation. You should implement the pyramid
+    functionality yourself using appropriate downsampling techniques.
+  </p>
+  <p>
+    <strong>Your job</strong> will be to implement an algorithm that, given a 3-channel image,
+    produces a color image as output. Implement a simple single-scale version
+    first, using for loops, searching over a user-specified window of
+    displacements. The above directory has skeleton Python code that
+    will help you get started and you should pick one of the smaller <code>.jpg</code>
+    images in the directory to test this version of the code. Next, add a
+    coarse-to-fine pyramid speedup to handle large images like the <code>.tif</code> ones
+    provided in the directory.
+  </p>
+  <p>
+    Note that in the case like the Emir of
+    Bukhara (show on right), the images to be matched do not actually have the
+    same brightness values (they are different color channels), so you might
+    have to use a cleverer metric, or different features than the raw pixels.
+    This image is a great candidate for a
+    <em>Bells &amp; Whistles</em> extension if you want to explore more advanced
+    alignment strategies or heuristics.
+  </p>
+  <p>
+    However, for grading, we allow up to <strong>one</strong> image (out of the original 14, excluding your own) to be misaligned in your
+    final results; aim to get the rest properly aligned.
+  </p>
+  <h3>Bells & Whistles (Extra for CS180, Mandatory for CS280A)</h3>
+  <p>
+    Although the color images resulting from this automatic procedure will
+    often look strikingly real, they are still a far cry from the manually
+    restored versions available on the LoC website and from other professional
+    photographers. Of course, each such photograph takes days of painstaking
+    Photoshop work, adjusting the color levels, removing the blemishes, adding
+    contrast, etc. Can we make some of these adjustments automatically,
+    without the human in the loop?
+  </p>
+  <p>Bells and whistles that CS280A students <strong>need</strong> to implement, but CS180 students are welcome to do for a bragging right. <i>You can use any libraries to solve bells and whistles as long as you can explain what it is doing and why you used it.</i></p>
+  <ul>
+    <li>
+      <strong>Automatic cropping.</strong> Remove white, black or other color borders. Don't
+      just crop a predefined margin off of each side -- actually try to detect
+      the borders or the edge between the border and the image.
+    </li>
+    <li>
+      <strong>Automatic contrasting.</strong> It is usually safe to rescale image intensities
+      such that the darkest pixel is zero (on its darkest color channel) and
+      the brightest pixel is 1 (on its brightest color channel). More drastic
+      or non-linear mappings may improve perceived image quality.
+    </li>
+    <li>
+      <strong>Automatic white balance.</strong> This involves two problems -- 1) estimating the
+      illuminant and 2) manipulating the colors to counteract the illuminant
+      and simulate a neutral illuminant. Step 1 is difficult in general, while
+      step 2 is simple (see the Wikipedia page on
+      <a href="http://en.wikipedia.org/wiki/Color_balance">Color Balance</a>
+      and section 2.3.2 in the <a href="https://szeliski.org/Book/">Szeliski book</a>). There exist some simple
+      algorithms for step 1, which don't necessarily work well -- assume that
+      the average color or the brightest color is the illuminant and shift
+      those to gray or white.
+    </li>
+    <li>
+      <strong>Better color mapping.</strong> There is no reason to assume (as we have) that the
+      red, green, and blue lenses used by Produkin-Gorskii correspond directly
+      to the R, G, and B channels in RGB color space. Try to find a mapping
+      that produces more realistic colors (and perhaps makes the automatic
+      white balancing less necessary).
+    </li>
+    <li>
+      <strong>Better features.</strong> Instead of aligning based on RGB similarity, try using
+      gradients or edges.
+    </li>
+  </ul>
+
+  <p>
+    (Optional) <strong>Feel free to come up with your own
+    approaches.</strong> There is no right answer here
+    -- just try out things and see what works. For example, the borders of the
+    photograph will have strange colors since the three channels won't exactly
+    align. See if you can devise an automatic way of cropping the border to
+    get rid of the bad stuff. One possible idea is that the information in the
+    good parts of the image generally agrees across the color channels,
+    whereas at borders it does not.</p>
+  <ul>
+    <li>
+      <strong>Better transformations.</strong> Instead of searching for the best x and y
+      translation, additionally search over small scale changes and rotations.
+      Adding two more dimensions to your search will slow things down, but the
+      same course to fine progression should help alleviate this.
+    </li>
+    <li>
+      <strong>Aligning and processing data from other sources.</strong> In many domains, such
+      as astronomy, image data is still captured one channel at a time. Often
+      the channels don't correspond to visible light, but NASA artists stack
+      these channels together to create false color images. For example, this
+      <a href="http://www.wikihow.com/Process-Your-Own-Colour-Images-from-Hubble-Data">tutorial</a>
+      on how to process Hubble Space Telescope imagery yourself. Also,
+      consider images like
+      <a href="http://www.flickr.com/photos/gsfc/7931831962/in/set-72157631408160534">this one of a coronal mass
+        ejection</a>
+      built by combining
+      <a href="http://www.nasa.gov/mission_pages/sunearth/news/News090412-filament.html">ultraviolet images</a>
+      from the Solar Dynamics Observatory. To truly show that your algorithm works, you
+      should demonstrate a non-trivial alignment
+      and color correction that your algorithm found.
+    </li>
+  </ul>
+
+  <h3>Deliverables</h3>
+  <p>
+    For this project, you must submit both your code and a project webpage as
+    <!-- TODO: Update fa24 to fa25 when URLs are ready -->
+    <a href="../submitting.html">described here</a>. 
+  </p>
+  <p>
+    The project webpage is your presentation of your work. Imagine that you are writing a blog post about your project for your friends. A good blog post is easy to read and follow, well organized, and visually appealing.
+  </p>
+  <p>
+    When you introduce new concepts or tricks that improve your results, explain them along the way and show the improved results of your algorithm on example images.
+  </p>
+  <p>
+    Below are the specific deliverables to keep in mind when writing your project webpage.
+  </p>
+  <ul>
+    <li>The results of a single-scale alignment (using NCC/L2 norm metrics) on the low-resolution images (JPEG files).</li>
+    <li>
+      The results of a multi-scale pyramid alignment (using NCC/L2 norm metrics) on <b>all</b> of our
+      <a href="https://drive.google.com/file/d/1XQUUR3R9qnVICT8I3hxd7cMxp5WfqkCA/view?usp=sharing">example images</a>. List the offsets you computed.
+    </li>
+    <li>
+      The results of your algorithm (using NCC/L2 norm metrics) on a few examples of your choosing,
+      downloaded from the <a href="https://www.loc.gov/collections/prokudin-gorskii/?st=grid">Prokudin-Gorskii collection</a>.
+    </li>
+    <li>
+      If your algorithm failed to align any image, provide a brief explanation of why.
+    </li>
+    <li>
+      Describe any bells and whistles you implemented. For maximum credit, show before-and-after images.
+    </li>
+    <li>
+      <strong>Submit your webpage URL to the class gallery via <a href="https://forms.gle/u4YEUGMo79swCcwt9" target="_blank">Google Form</a>.</strong>
+      Also include this URL in your Gradescope submission.
+    </li>
+  </ul>
+  <p>
+    <b>Important:</b> Images are for the project webpage only. Do <u>not</u> upload image files (e.g., <code>.jpg</code>, <code>.png</code>, <code>.tif</code>) to Gradescope. This keeps submissions small and avoids hitting Gradescope's 100&nbsp;MB upload limit, which large image sets can easily exceed.
+  </p>
+
+  <h3>Final Advice</h3>
+  <ul>
+    <li>You’ll build image pyramids again in Project 2—write clean, reusable code.</li>
+    <li>Implement almost everything from scratch. It’s fine to use functions for reading, writing, resizing, shifting, and displaying images (e.g., imread, imresize, circshift), but don’t use high‑level functions for Laplacian/Gaussian pyramids, automatic alignment, etc. If in doubt, ask on Ed.</li>
+    <li>Aim for under 1 minute per image. If it takes hours, optimize.</li>
+    <li>Vectorize/parallelize and avoid many for‑loops. See Python performance tips and NumPy broadcasting:
+      <a href="https://wiki.python.org/moin/PythonSpeed/PerformanceTips#Loops">Python</a> ·
+      <a href="https://numpy.org/doc/stable/user/basics.broadcasting.html">NumPy Broadcasting</a>.
+    </li>
+    <li>Use a fixed set of parameters; don’t over‑tune per image. One failure is okay with simple metrics.</li>
+    <li>Convert images to floats and the same scale (e.g., im2double/im2uint8). JPGs are uint8; TIFFs may be uint16.</li>
+    <li>Shift arrays with <code>np.roll</code>.</li>
+    <li>Ignore borders when scoring; compute metrics on interior pixels.</li>
+    <li>Save outputs as JPG to reduce disk usage.</li>
+  </ul>
+
+  <h3>Grading Rubric</h3>
+  <p>This assignment will be graded out of <b>100</b> points, as follows:</p>
+  <div class="rubric">
+    <div class="rubric-col">
+      <h4>CS180</h4>
+      <h5>Single-scale alignment (60 points total)</h5>
+      <div class="rubric-indent">
+        <p><b>For results:</b></p>
+        <ul>
+          <li><b>+50%:</b> No alignment defects on “cathedral,” “monastery,” “tobolsk.” (Assume single‑scale is satisfied if pyramids work.)</li>
+          <li><b>+30%:</b> Some defects on “cathedral,” “monastery,” “tobolsk.”</li>
+          <li><b>0%:</b> No effort on alignment.</li>
+        </ul>
+        <p><b>For presentation:</b></p>
+        <ul>
+          <li><b>+50%:</b> Thorough explanation / approach / good presentation.</li>
+          <li><b>+30%:</b> Explanation present, could go further in depth.</li>
+          <li><b>+20%:</b> Minimal explanation on webpage.</li>
+          <li><b>0%:</b> No section / no explanation on webpage.</li>
+        </ul>
+      </div>
+
+      <h5>Multi-scale pyramid alignment (with NCC / L2) (40 points total)</h5>
+      <div class="rubric-indent">
+        <p><b>For results:</b></p>
+        <ul>
+          <li><b>+50%:</b> Alignment defects on ≤ 1 / 14 images.</li>
+          <li><b>+40%:</b> Alignment defects on ≤ 3 / 14 images, or missing.</li>
+          <li><b>+30%:</b> Alignment defects on ≤ 6 / 14 images, or missing.</li>
+          <li><b>+20%:</b> Alignment defects on &gt; 6 / 14 images, but effort shown.</li>
+          <li><b>0%:</b> No effort on alignment.</li>
+        </ul>
+        <p><b>For presentation:</b></p>
+        <ul>
+          <li><b>+50%:</b> Thorough explanation, walking through each step carefully (e.g., NCC / L2).</li>
+          <li><b>+40%:</b> Explains motivation / approach / good presentation.</li>
+          <li><b>+30%:</b> Explanation present, could go further in depth.</li>
+          <li><b>+20%:</b> Minimal explanation on webpage.</li>
+          <li><b>0%:</b> No explanation on webpage.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rubric-col">
+      <h4>CS280A</h4>
+      <h5>Single-scale alignment (40 points total)</h5>
+      <h5>Multi-scale pyramid alignment (with NCC / L2) (30 points total)</h5>
+      <h5>Bells &amp; Whistles (30 points total; 6 points per item)</h5>
+      <div class="rubric-indent">
+        <p><b>Required items (CS280A) — 6 points each:</b></p>
+        <ul>
+          <li>Automatic cropping</li>
+          <li>Automatic contrasting</li>
+          <li>Automatic white balance</li>
+          <li>Better color mapping</li>
+          <li>Better features</li>
+        </ul>
+        <p><b>For results (per item):</b></p>
+        <ul>
+          <li><b>+20%:</b> Additional trick is interesting / produces noticeably better results.</li>
+        </ul>
+        <p><b>For presentation (per item):</b></p>
+        <ul>
+          <li><b>+80%:</b> Thorough explanation, motivation, approach, before &amp; after results.</li>
+          <li><b>+60%:</b> Explanation present, could go further in depth.</li>
+          <li><b>+40%:</b> Minimal explanation + visual results.</li>
+          <li><b>0%:</b> No effort / no explanation on webpage.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <h3>Common Questions</h3>
+  <p><b>Q: What’s considered a good alignment vs. a bad alignment?</b></p>
+  <p>Since one failure is allowed while still receiving full credit for alignment, aim for strong results on most images (with a few failures) rather than acceptable-but-mediocre results on all images.</p>
+  <table style="margin: 0.5em auto 1em auto; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="padding: 0.25em 0.75em; text-align: center;">Okay</th>
+        <th style="padding: 0.25em 0.75em; text-align: center;">Not Okay</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding: 0.25em 0.75em; text-align: center; vertical-align: top;">
+          <img src="proj1_files/okay.png" alt="Example of acceptable alignment" style="height: 200px; width: auto; max-width: 320px; border: 1px solid #ddd; object-fit: contain;">
+        </td>
+        <td style="padding: 0.25em 0.75em; text-align: center; vertical-align: top;">
+          <img src="proj1_files/notokay.png" alt="Example of unacceptable alignment" style="height: 200px; width: auto; max-width: 320px; border: 1px solid #ddd; object-fit: contain;">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><b>Q: What if I used a better distance function beyond L2 and NCC to get better alignments?</b></p>
+  <p>That’s great and encouraged. However, to receive full credit you must still document results using the basic distance functions (L2/NCC). If you skip this, your presentation score will be penalized.</p>
+
+</body>
+
+</html>

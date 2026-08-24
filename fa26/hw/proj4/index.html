@@ -1,0 +1,1104 @@
+<html>
+
+<head>
+  <script async='' type='text/javascript' src='https://siteimproveanalytics.com/js/siteanalyze_6294756.js'></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>CS180: Intro to Computer Vision and Computational Photography</title>
+  <link rel="StyleSheet" href="../style.css" type="text/css" media="all" />
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  <style>
+    /* Two image containers */
+    .column {
+      float: left;
+      width: 45%;
+      padding: 5px;
+    }
+
+    /* Clear floats after image containers */
+    .row::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+  </style>
+</head>
+
+<body data-new-gr-c-s-check-loaded="14.1027.0" data-gr-ext-installed="">
+  <h1>
+    <img src="../../463_files/ucbseal_139_540.png" alt="berkeley logo" height="75" width="75" />Programming Project #4
+    (<tt>proj4</tt>)<br />
+    <a href="https://cal-cs180.github.io/fa25/">CS180: Intro to Computer Vision and Computational Photography </a>
+  </h1>
+
+  <br />
+  <h1 style="text-align: center">Neural Radiance Field!</h1>
+  <h2 style="text-align: center">
+    <b>Due Date: November 14th, 2025</b>
+  </h2>
+  <h4 style="text-align: center">
+    <b>Note on compute requirements:</b> We're using PyTorch to implement neural networks with GPU acceleration.
+    If you have an M-series Mac (M1/M2/M3), you should be able to run everything locally using the
+    <a href="https://pytorch.org/docs/stable/notes/mps.html">MPS backend</a>.
+    For older or less powerful hardware, we recommend using GPUs from <a href="https://colab.research.google.com/">Colab</a>.
+    Colab Pro is now <a href="https://colab.research.google.com/signup">free</a> for students.
+  </h4>
+
+  <hr style="font-weight: bold;"/>
+
+  <h1>Part 0: Calibrating Your Camera and Capturing a 3D Scan</h1>
+  <p class="text">
+    For the first part of the assignment, you will take a 3D scan of your own object which you will build a NeRF of
+    later!
+    To do this, we will use visual tracking targets called <a
+      href="https://cs-courses.mines.edu/csci507/schedule/24/ArUco.pdf">ArUco tags</a>,
+    which provide a way to reliably detect the same 3D keypoints across different images. There are 2 parts: 1)
+    calibrating your camera
+    parameters, and 2) using them to estimate pose. This part can be done entirely locally on your laptop, no need for a
+    GPU. We will be using
+    many helper functions from <a href="https://opencv.org/">OpenCV</a>, which you can install with
+    <code>pip install opencv-python</code>.
+  </p>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 0.1: Calibrating Your Camera</h3>
+  <p class="text">
+    First, either print out the following <a href="assets/aruco_grid-2.pdf">calibration tags</a> or pull them up on a
+    laptop/iPad screen.
+    Capture 30-50 images of these tags from your phone camera, <b>keeping the zoom the same</b>. While capturing,
+    results will be best if you
+    vary the angle/distance of the camera, like shown in chessboard calibration in lecture.
+  </p>
+  <p class="text">
+    <b>Note:</b> For the purpose of this assignment, phone cameras work better since they provide undistorted images
+    without lens effects. If you use a real camera, try to make
+    sure there are no distortion effects.
+  </p>
+  <p class="text">
+    Now you'll write a script to calibrate your camera using the images you captured. Here's the pipeline:
+  </p>
+  <ol>
+    <li>Loop through all your calibration images</li>
+    <li>For each image, detect the ArUco tags using OpenCV's ArUco detector</li>
+    <li>Extract the corner coordinates from the detected tags</li>
+    <li>Collect all detected corners and their corresponding 3D world coordinates (you can consider the ArUco tag as the world origin and define the 4 corners' 3D points relative to that, e.g., if your tag is 0.02m × 0.02m, the corners could be [(0,0,0), (0.02,0,0), (0.02,0.02,0), (0,0.02,0)])</li>
+    <li>Use <a
+        href="https://docs.opencv.org/4.x/d9/d0c/group__calib3d.html#ga3207604e4b1a1758aa66acb6ed5aa65d"><code>cv2.calibrateCamera()</code></a>
+      to compute the camera intrinsics and distortion coefficients</li>
+  </ol>
+  <p class="text">
+    <b>Important:</b> Your code should handle cases where tags aren't detected in some images (this is common). Make
+    sure to check if tags were
+    found before trying to use the detection results, otherwise your script will crash.
+  </p>
+  <p class="text">Here's a code snippet to get you started with detecting ArUco tags (the tags in the PDF are 4x4):</p>
+  <div style="width: 100%; margin: 0 auto">
+    <pre><code>import cv2
+import numpy as np
+
+# Create ArUco dictionary and detector parameters (4x4 tags)
+aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+aruco_params = cv2.aruco.DetectorParameters()
+
+# Detect ArUco markers in an image
+# Returns: corners (list of numpy arrays), ids (numpy array)
+corners, ids, _ = cv2.aruco.detectMarkers(image, aruco_dict, parameters=aruco_params)
+
+# Check if any markers were detected
+if ids is not None:
+    # Process the detected corners
+    # corners: list of length N (number of detected tags)
+    #   - each element is a numpy array of shape (1, 4, 2) containing the 4 corner coordinates (x, y)
+    # ids: numpy array of shape (N, 1) containing the tag IDs for each detected marker
+    # Example: if 3 tags detected, corners will be a list of 3 arrays, ids will be shape (3, 1)
+else:
+    # No tags detected in this image, skip it
+    pass
+</code></pre>
+  </div>
+
+  <hr/>
+
+  <h3>Part 0.2: Capturing a 3D Object Scan</h3>
+  <p class="text">
+    Next, pick a favorite object of yours, and print out a <b>single</b> ArUco tag, which you can generate from
+    <a href="https://chev.me/arucogen/">here</a>. Place the object next to the tag on a tabletop, and capture 30-50
+    images of the object from
+    different angles. <b>Important: Use the same camera and zoom level as you did for calibration.</b> If you cut out
+    the ArUco tag from a piece of paper, make sure
+    to leave a white border around it, otherwise detection will fail.
+  </p>
+  <p class="text">Capture tips for good quality NeRF results later:</p>
+  <ol>
+    <li>Avoid brightness/exposure changes (this is why printing the tag will work better than using a tablet display)
+    </li>
+    <li>Avoid blurry images, try not to introduce motion blur</li>
+    <li>Capture images at varying angles horizontally and vertically</li>
+    <li>Capture images at one uniform distance, about 10-20cm away from the object so that it fills ~50% of the frame
+    </li>
+  </ol>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 0.3: Estimating Camera Pose</h3>
+  <p class="text">
+    Now that you have calibrated your camera, you can use those intrinsic parameters to estimate the camera pose
+    (position and orientation) for
+    each image of your object. As discussed in lecture, this is the classic <b>Perspective-n-Point (PnP)</b> problem:
+    given a set of 3D points
+    in world coordinates and their corresponding 2D projections in an image, we want to find the camera's extrinsic
+    parameters (rotation and
+    translation).
+  </p>
+  <p class="text">
+    For each image in your object scan, you'll detect the single ArUco tag and use <code>cv2.solvePnP()</code> to
+    estimate the camera pose.
+    Here's what you need:
+  </p>
+  <p class="text"><b>Inputs to solvePnP:</b></p>
+  <ul>
+    <li>
+      <b>objectPoints</b> (numpy array of shape (N, 3) or (N, 1, 3)): The 3D coordinates of the ArUco tag corners in
+      world space. Since you know the physical size of your printed tag,
+      you can define these coordinates. For example, if your tag is 0.02m × 0.02m, you might define the 4 corners as:
+      [(0,0,0), (0.02,0,0), (0.02,0.02,0),
+      (0,0.02,0)] in meters, with the tag lying flat on the z=0 plane.
+    </li>
+    <li><b>imagePoints</b> (numpy array of shape (N, 2) or (N, 1, 2)): The detected 2D pixel coordinates of the tag
+      corners in the image (from <code>detectMarkers()</code>).
+      You'll need to reshape the corners array from detectMarkers to match this shape.</li>
+    <li>
+      <b>cameraMatrix</b> (numpy array of shape (3, 3)): The intrinsic matrix K that you computed in Part 0.1 (contains
+      focal length and principal point)
+    </li>
+    <li><b>distCoeffs</b> (numpy array or None): The distortion coefficients from calibration</li>
+  </ul>
+  <p class="text"><b>Output from solvePnP:</b></p>
+  <ul>
+    <li>
+      <b>success</b> (bool): Whether the pose estimation succeeded
+    </li>
+    <li>
+      <b>rvec</b> (numpy array of shape (3, 1)): Axis-Angle rotation vector (can be converted to a 3×3 rotation matrix
+      using <code>cv2.Rodrigues()</code>)
+    </li>
+    <li><b>tvec</b> (numpy array of shape (3, 1)): Translation vector</li>
+  </ul>
+  <p class="text">
+    Together, the rotation matrix R (from rvec) and translation vector tvec form the camera's extrinsic matrix, which
+    describes where the camera is positioned and oriented relative to the ArUco tag's
+    coordinate system (which we're treating as the world origin). <b>Note:</b> OpenCV's <code>solvePnP()</code> returns the world-to-camera transformation; you will need to invert this to get the camera-to-world (c2w) matrix for visualization and Part 0.4.
+  </p>
+  <p class="text">
+    <b>Important:</b> Just like in Part 0.1, make sure your code handles cases where the tag isn't detected in some
+    images. You should skip
+    those images rather than letting your code crash.
+  </p>
+  <p class="text">
+    To help visualize your pose estimation results, you can use the following code snippet to display a camera frustum
+    in 3D (<code>pip install viser</code>):
+  </p>
+  <div style="width: 100%; margin: 0 auto">
+    <pre><code>import viser
+import numpy as np
+
+server = viser.ViserServer(share=True)
+# Example of visualizing a camera frustum (in practice loop over all images)
+# c2w is the camera-to-world transformation matrix (3x4), and K is the camera intrinsic matrix (3x3)
+server.scene.add_camera_frustum(
+    f"/cameras/{i}", # give it a name
+    fov=2 * np.arctan2(H / 2, K[0, 0]), # field of view
+    aspect=W / H, # aspect ratio
+    scale=0.02, # scale of the camera frustum change if too small/big
+    wxyz=viser.transforms.SO3.from_matrix(c2w[:3, :3]).wxyz, # orientation in quaternion format
+    position=c2w[:3, 3], # position of the camera
+    image=img # image to visualize
+)
+
+while True:
+    time.sleep(0.1)  # Wait to allow visualization to run
+</code></pre>
+  </div>
+
+  <p class="text">
+    <b>[Deliverables]</b> Include 2 screenshots of your cloud of cameras in Viser showing the camera frustums' poses and images.
+  </p>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 0.4: Undistorting images and creating a dataset</h3>
+  <p class="text">
+    Now that you have the camera intrinsics and pose estimates, the final step is to undistort your images and package
+    everything into a
+    dataset format that you can use for training NeRF in the later parts of this project.
+  </p>
+  <p class="text">
+    First, use <code>cv2.undistort()</code> to remove any lens distortion from your images. This is important because
+    NeRF assumes a perfect
+    pinhole camera model without distortion.
+  </p>
+  <div style="width: 100%; margin: 0 auto">
+    <pre><code>import cv2
+
+# Undistort an image using the calibration results
+undistorted_img = cv2.undistort(img, camera_matrix, dist_coeffs)
+</code></pre>
+  </div>
+  <p class="text">
+    <b>Note on black boundaries:</b> If you see black boundaries after undistorting your images, you can use
+    <code>cv2.getOptimalNewCameraMatrix()</code> to compute a new camera matrix that crops out the invalid pixels.
+    This function returns both a new intrinsics matrix and a valid pixel ROI (region of interest). You can then
+    crop your undistorted images to this ROI to remove the black borders. <b>Important:</b> If you crop your images
+    this way, make sure to update the principal point in your intrinsics matrix to account for the crop offset, as
+    the coordinate system origin has shifted.
+  </p>
+  <div style="width: 100%; margin: 0 auto">
+    <pre><code>import cv2
+
+# Example: Handling black boundaries from undistortion
+h, w = img.shape[:2]
+# alpha=1 keeps all pixels (more black borders), alpha=0 crops maximally
+new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
+    camera_matrix, dist_coeffs, (w, h), alpha=0, (w, h)
+)
+undistorted_img = cv2.undistort(img, camera_matrix, dist_coeffs, None, new_camera_matrix)
+
+# Crop to the valid region of interest
+x, y, w_roi, h_roi = roi
+undistorted_img = undistorted_img[y:y+h_roi, x:x+w_roi]
+
+# Update the principal point to account for the crop offset
+new_camera_matrix[0, 2] -= x  # cx
+new_camera_matrix[1, 2] -= y  # cy
+
+# Use new_camera_matrix (with updated principal point) when creating your dataset!
+</code></pre>
+  </div>
+  <p class="text">
+    After undistorting all your images, you'll need to save everything in a <code>.npz</code> file format that matches
+    what's expected for the
+    NeRF training code. You should split your images into training, validation, and test sets, then save using the
+    following keys:
+  </p>
+  <ul>
+    <li><b>images_train</b>: numpy array of shape (N_train, H, W, 3) containing your undistorted training images (0-255
+      range, will be normalized when loaded)</li>
+    <li><b>c2ws_train</b>: numpy array of shape (N_train, 4, 4) containing the camera-to-world transformation matrices
+      for training images</li>
+    <li><b>images_val</b>: numpy array of shape (N_val, H, W, 3) for validation images</li>
+    <li><b>c2ws_val</b>: numpy array of shape (N_val, 4, 4) for validation camera poses</li>
+    <li><b>c2ws_test</b>: numpy array of shape (N_test, 4, 4) for test camera poses (used for novel view rendering)</li>
+    <li><b>focal</b>: float representing the focal length from your camera intrinsics (assuming fx = fy)</li>
+  </ul>
+  <p class="text">
+    You can save your dataset using <code>np.savez()</code>:
+  </p>
+  <div style="width: 100%; margin: 0 auto">
+    <pre><code>import numpy as np
+
+# Package your data (keep images in 0-255 range, they'll be normalized when loaded)
+np.savez(
+    'my_data.npz',
+    images_train=images_train,    # (N_train, H, W, 3)
+    c2ws_train=c2ws_train,        # (N_train, 4, 4)
+    images_val=images_val,        # (N_val, H, W, 3)
+    c2ws_val=c2ws_val,            # (N_val, 4, 4)
+    c2ws_test=c2ws_test,          # (N_test, 4, 4)
+    focal=focal                   # float
+)
+</code></pre>
+  </div>
+  <p class="text">
+    This dataset can then be loaded in Parts 1 and 2 the same way the provided lego dataset is loaded, allowing you to
+    train a NeRF on your
+    own captured object!<br /><br />As a sanity check you can test your calibration implementation on our <a
+      href="https://drive.google.com/drive/folders/1utiPjbEvnf87Eg4h-7WYVTXk2q6lI4rn?usp=sharing">calibration images</a>
+    and our <a href="https://drive.google.com/drive/folders/1aoLM-ay2ZjatVIEtFW7QtuNyjciwydsC?usp=sharing">Lafufu
+      dataset</a> which we
+    used to train the NeRF example seen at the end of this project.
+  </p>
+
+  <hr style="font-weight: bold;"/>
+
+  <h1>Part 1: Fit a Neural Field to a 2D Image</h1>
+  <p class="text">
+    From the lecture we know that we can use a Neural Radiance Field (NeRF) (\(F: \{x, y, z, \theta, \phi\} \rightarrow
+    \{r, g, b,
+    \sigma\}\)) to represent a 3D space. But before jumping into 3D, let's first get familar with NeRF (and PyTorch)
+    using a 2D example.
+    In fact, since there is no concept of radiance in 2D, the Neural Radiance Field falls back to just a Neural Field
+    (\(F: \{u, v\}
+    \rightarrow \{r, g, b\}\)) in 2D, in which \(\{u, v\}\) is the pixel coordinate. In this section, we will create a
+    neural field that
+    can represent a 2D image and optimize that neural field to fit this image. You can start from
+    <a href="https://live.staticflickr.com/7492/15677707699_d9d67acf9d_b.jpg">this image</a>, but feel free to try out
+    any other images.
+  </p>
+
+  <p class="text">
+    <b>[Impl: Network]</b> You would need to create an <em>Multilayer Perceptron (MLP)</em> network with
+    <em>Sinusoidal Positional Encoding (PE)</em> that takes in the 2-dim pixel coordinates, and output the 3-dim pixel
+    colors.
+  </p>
+  <ul>
+    <li>
+      Multilayer Perceptron (MLP): An MLP is simply a stack of non linear activations (e.g.,
+      <a href="https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html">torch.nn.ReLU()</a>
+      or <a href="https://pytorch.org/docs/stable/generated/torch.nn.Sigmoid.html">torch.nn.Sigmoid()</a>) and fully
+      connected layers (<a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html">torch.nn.Linear()</a>).
+      For this part, you can start from building an MLP with the structure shown in the image below. Note that you would
+      need to have
+      a Sigmoid layer at the end of the MLP to constrain the network output be in the range of (0, 1), as a valid pixel
+      color (don't
+      forget to also normalize your image from [0, 255] to [0, 1] when you use it for supervision!). You can take a
+      reference from
+      <a href="https://machinelearningmastery.com/building-multilayer-perceptron-models-in-pytorch/">this tutorial</a>
+      on how to create an MLP in PyTorch.
+      <img src="assets/mlp_img.jpg" alt="MLP" height="150"
+        style="display: block; margin-left: auto; margin-right: auto" />
+    </li>
+    <li>
+      Sinusoidal Positional Encoding (PE): PE is an operation that you apply a serious of sinusoidal functions to the
+      input cooridnates,
+      to expand its dimensionality (See equation 4 from <a href="https://arxiv.org/pdf/2003.08934.pdf">this paper</a>
+      for reference). Note
+      we also additionally keep the original input in PE, so the complete formulation is \[PE(x) = \{x, sin(2^0\pi x),
+      cos(2^0\pi x),
+      sin(2^1\pi x), cos(2^1\pi x), ..., sin(2^{L-1}\pi x), cos(2^{L-1}\pi x)\}\] in which \(L\) is the highest
+      frequency level. You can
+      start from \(L=10\) that maps a 2 dimension coordinate to a 42 dimension vector.
+    </li>
+  </ul>
+
+  <p class="text">
+    <b>[Impl: Dataloader]</b> If the image is with high resolution, it might be not feasible train the network with the
+    all the pixels in
+    every iteration due to the GPU memory limit. So you need to implement a dataloader that randomly sample \(N\) pixels
+    at every
+    iteration for training. The dataloader is expected to return both the \(N\times2\) 2D coordinates and \(N\times3\)
+    colors of the
+    pixels, which will serve as the input to your network, and the supervision target, respectively (essentially you
+    have a batch size of
+    \(N\)). You would want to normalize both the coordinates (x = x / image_width, y = y / image_height) and the colors
+    (rgbs = rgbs /
+    255.0) to make them within the range of [0, 1].
+  </p>
+
+  <p class="text">
+    <b>[Impl: Loss Function, Optimizer, and Metric]</b> Now that you have the network (MLP) and the dataloader, you need
+    to define the
+    loss function and the optimizer before you can start training your network. You will use mean squared error loss
+    (MSE) (<a href="https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html">torch.nn.MSELoss</a>) between the
+    predicted color and the groundtruth color. Train your network using Adam (<a
+      href="https://pytorch.org/docs/stable/generated/torch.optim.Adam.html">torch.optim.Adam</a>) with a learning rate
+    of 1e-2. Run the training loop for 1000 to 3000 iterations with a batch size of 10k. For the metric, MSE is a
+    good one but it is more common to use
+    <a href="https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio">Peak signal-to-noise ratio (PSNR)</a> when it
+    comes to measuring
+    the reconstruction quality of a image. If the image is normalized to [0, 1], you can use the following equation to
+    compute PSNR from
+    MSE: \[PSNR = 10 \cdot log_{10}\left(\frac{1}{MSE}\right)\]
+  </p>
+
+  <p class="text">
+    <b>[Impl: Hyperparameter Tuning]</b> Vary the layer width (channel size) and the max frequency \(L\) for
+    the positional encoding.
+  </p>
+
+  <img src="assets/2D_training.jpg" alt="training" height="150"
+    style="display: block; margin-left: auto; margin-right: auto" />
+
+  <p class="text">
+    <b>[Deliverables]</b> As a reference, the above images show the process of optimizing the network to fit on this
+    image.
+  </p>
+  <ul>
+    <li>
+      Report your model architecture including number of layers, width, and learning rate. Feel free to add other details you think are important.
+    </li>
+    <li>
+      Show training progression (images at different iterations, similar to the above reference) on both the provided test image and one of your own images.
+    </li>
+    <li>
+      Show final results for 2 choices of max positional encoding frequency and 2 choices of width (a 2x2 grid of results). Try very low values for these hyperparameters to see how it affects the outputs.
+    </li>
+    <li>
+      Show the PSNR curve for training on one image of your choice.
+    </li>
+  </ul>
+
+  <hr style="font-weight: bold;"/>
+
+  <h1>Part 2: Fit a Neural Radiance Field from Multi-view Images</h1>
+
+  <p class="text">
+    Now that we are familiar with using a neural field to represent a image, we can proceed to a more interesting task
+    that using a neural
+    <em>radiance</em> field to represent a 3D space, through inverse rendering from multi-view calibrated images. For
+    this part we are
+    going to use the Lego scene from the original <a href="https://www.matthewtancik.com/nerf">NeRF paper</a>, but with
+    lower resolution
+    images (200 x 200) and preprocessed cameras (downloaded from <a href="./assets/lego_200x200.npz">here</a>). The
+    following code can be
+    used to parse the data. The figure on its right shows a plot of all the cameras, including training cameras in
+    black, validation
+    cameras in red, and test cameras in green.
+  </p>
+
+  <div class="row">
+    <div class="column">
+      <div style="width: 100%; margin: 0 auto">
+        <pre><code>data = np.load(f"lego_200x200.npz")
+
+# Training images: [100, 200, 200, 3]
+images_train = data["images_train"] / 255.0
+
+# Cameras for the training images 
+# (camera-to-world transformation matrix): [100, 4, 4]
+c2ws_train = data["c2ws_train"]
+
+# Validation images: 
+images_val = data["images_val"] / 255.0
+
+# Cameras for the validation images: [10, 4, 4]
+# (camera-to-world transformation matrix): [10, 200, 200, 3]
+c2ws_val = data["c2ws_val"]
+
+# Test cameras for novel-view video rendering: 
+# (camera-to-world transformation matrix): [60, 4, 4]
+c2ws_test = data["c2ws_test"]
+
+# Camera focal length
+focal = data["focal"]  # float
+</code></pre>
+      </div>
+    </div>
+    <div class="column">
+      <img src="assets/data_plot.png" height="400" alt="data plot"
+        style="display: block; margin-left: auto; margin-right: auto" />
+    </div>
+  </div>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 2.1: Create Rays from Cameras</h3>
+  <!-- <div class="row">
+      <div class="column">
+        <img src="assets/nerf_teaser.png" alt="nerf teaser" height="300" style="display: block; margin-left: auto; margin-right: auto" />
+      </div>
+      <div class="column">
+        <img
+          src="assets/pinhole_camera.png"
+          alt="pinhole camera"
+          height="300"
+          style="display: block; margin-left: auto; margin-right: auto"
+        />
+      </div>
+    </div> -->
+
+  <p class="text">
+    <b>Camera to World Coordinate Conversion.</b> The transformation between the world space \(\mathbf{X_w} = (x_w, y_w,
+    z_w)\) and the
+    camera space \(\mathbf{X_c} = (x_c, y_c, z_c)\) can be defined as a rotation matrix \(\mathbf{R}_{3\times3}\) and a
+    translation vector
+    \(\mathbf{t}\): \[\begin{align} \begin{bmatrix} x_c \\ y_c \\ z_c \\ 1 \end{bmatrix} = \begin{bmatrix}
+    \mathbf{R}_{3\times3} &
+    \mathbf{t} \\ \mathbf{0}_{1\times3} & 1 \end{bmatrix} \begin{bmatrix} x_w \\ y_w \\ z_w \\ 1 \end{bmatrix}
+    \end{align}\] in which
+    \(\begin{bmatrix} \mathbf{R}_{3\times3} & \mathbf{t} \\ \mathbf{0}_{1\times3} & 1 \end{bmatrix}\) is called
+    world-to-camera
+    (<code>w2c</code>) transformation matrix, or extrinsic matrix. The inverse of it is called camera-to-world
+    (<code>c2w</code>)
+    transformation matrix.
+  </p>
+  <p class="text">
+    <b>[Impl]</b> In this session you would need to implement a function <code>x_w = transform(c2w, x_c)</code> that
+    transform a point
+    from camera to the world space. You can verify your implementation by checking if the follow statement is always
+    true:
+    <code>x == transform(c2w.inv(), transform(c2w, x))</code>. Note you might want your implementation to support
+    batched coordinates for
+    later use. You can implement it with either numpy or torch.
+  </p>
+
+  <p class="text">
+    <b>Pixel to Camera Coordinate Conversion.</b> Consider a pinhole camera with focal length \((f_x, f_y)\) and
+    principal point \((o_x =
+    \text{image_width} / 2, o_y = \text{image_height} / 2)\), it's intrinsic matrix \(\mathbf{K}\) is defined as:
+    \[\begin{align}
+    \mathbf{K} = \begin{bmatrix} f_x & 0 & o_x \\ 0 & f_y & o_y \\ 0 & 0 & 1 \end{bmatrix} \end{align}\] which can be
+    used to project a 3D
+    point \((x_c, y_c, z_c)\) in the <em>camera coordinate system</em> to a 2D location \((u, v)\) in <em>pixel
+      coordinate system</em> :
+    \[\begin{align} s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \mathbf{K} \begin{bmatrix} x_c \\ y_c \\ z_c
+    \end{bmatrix} \end{align}\]
+    in which \(s=z_c\) is the depth of this point along the optical axis.
+  </p>
+  <p class="text">
+    <b>[Impl]</b> In this session you would need to implement a function that invert the aforementioned process, which
+    transform a point
+    from the pixel coordinate system back to the camera coordinate system: <code>x_c = pixel_to_camera(K, uv, s)</code>.
+    Similar to the
+    previous session, you might also want your implementation here to support batched coordinates for later use. You can
+    implement it with
+    either numpy or torch.
+  </p>
+
+  <p class="text">
+    <b>Pixel to Ray.</b> A ray can be defined by an origin vector \(\mathbf{r}_o \in R^3\) and a direction
+    vector \(\mathbf{r}_d \in R^3\). In the case of a pinhole camera, we want to know the \(\{\mathbf{r}_o, \mathbf{r}_d\}\) for every pixel
+    \((u, v)\). The
+    origin \(\mathbf{r}_o\) of those rays is easy to get because it is just the location of the camera in world coordinates.
+    For a camera-to-world (c2w) transformation matrix \(\begin{bmatrix} \mathbf{R}_{3\times3} & \mathbf{t} \\
+    \mathbf{0}_{1\times3} & 1 \end{bmatrix}\), the camera origin is simply the translation component:
+    \[\begin{align} \mathbf{r}_o = \mathbf{t} \end{align}\]
+    To calculate the ray direction for pixel \((u, v)\), we can
+    simply choose a point
+    along this ray with depth equal to 1 (\(s=1\)) and find its coordinate in world space \(\mathbf{X_w} = (x_w, y_w,
+    z_w)\) using your previously implemented functions. Then the
+    normalized ray direction can be computed by: \[\begin{align} \mathbf{r}_d = \frac{\mathbf{X_w} -
+    \mathbf{r}_o}{||\mathbf{X_w} -
+    \mathbf{r}_o||_2} \end{align}\]
+  </p>
+  <p class="text">
+    <b>[Impl]</b> In this section you will need to implement a function that converts a pixel coordinate to a ray
+    with origin and
+    normalized direction: <code>ray_o, ray_d = pixel_to_ray(K, c2w, uv)</code>. You might find your previously
+    implemented functions
+    useful here. Similarly, you might also want your implementation to support batched coordinates.
+  </p>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 2.2: Sampling</h3>
+  <p class="text">
+    <b>[Impl: Sampling Rays from Images]</b> In Part 1, we have done random sampling on a single image to get the pixel
+    color and pixel
+    coordinates. Here we can build on top of that, and with the camera intrinsics & extrinsics, we would be able to
+    convert the pixel
+    coordinates into ray origins and directions. Make sure to account for the offset from image coordinate to pixel
+    center (this can be
+    done simply by adding .5 to your UV pixel coordinate grid)! Since we have multiple images now, we have two options
+    of sampling rays.
+    Say we want to sample N rays at every training iteration, option 1 is to first sample M images, and then sample N //
+    M rays from every
+    image. The other option is to flatten all pixels from all images and do a global sampling once to get N rays from
+    all images. You can
+    choose which ever way do ray sampling.
+  </p>
+
+  <p class="text">
+    <b>[Impl: Sampling Points along Rays.]</b> After having rays, we also need to discritize each ray into samples that
+    live in the 3D
+    space. The simplist way is to uniformly create some samples along the ray
+    (<code>t = np.linspace(near, far, n_samples)</code>). For
+    the lego scene that we have, we can set <code>near=2.0</code> and <code>far=6.0</code>. The actually 3D corrdinates
+    can be accquired
+    by \(\mathbf{x} = \mathbf{R}_o + \mathbf{R}_d * t\). However this would lead to a fixed set of 3D points, which
+    could potentially lead
+    to overfitting when we train the NeRF later on. On top of this, we want to introduce some small perturbation to the
+    points
+    <em>only during training</em>, so that every location along the ray would be touched upon during training. this can
+    be achieved by
+    something like <code>t = t + (np.random.rand(t.shape) * t_width)</code> where t is set to be the start of each
+    interval. We recommend
+    to set <code>n_samples</code> to 32 or 64 in this project.
+  </p>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 2.3: Putting the Dataloading All Together</h3>
+
+  <p class="text">
+    Similar to Part 1, you would need to write a dataloader that randomly sample pixels from multiview images. What is
+    different with Part
+    1, is that now you need to convert the pixel coordinates into rays in your dataloader, and return ray origin, ray
+    direction and pixel
+    colors from your dataloader. To verify if you have by far implement everything correctly, we here provide some
+    visualization code to
+    plot the cameras, rays, and samples in 3D. We additionally recommend you try this code with rays sampled only from
+    one camera so you
+    can make sure that all the rays stay within the camera frustum and eliminating the possibility of other smaller
+    harder to catch bugs.
+  </p>
+
+  <div class="row">
+    <div class="column">
+      <div style="width: 100%; margin: 0 auto">
+        <pre><code>import viser, time  # pip install viser
+import numpy as np
+
+# --- You Need to Implement These ------
+dataset = RaysData(images_train, K, c2ws_train)
+rays_o, rays_d, pixels = dataset.sample_rays(100) # Should expect (B, 3)
+points = sample_along_rays(rays_o, rays_d, perturb=True)
+H, W = images_train.shape[1:3]
+# ---------------------------------------
+
+server = viser.ViserServer(share=True)
+for i, (image, c2w) in enumerate(zip(images_train, c2ws_train)):
+    server.add_camera_frustum(
+        f"/cameras/{i}",
+        fov=2 * np.arctan2(H / 2, K[0, 0]),
+        aspect=W / H,
+        scale=0.15,
+        wxyz=viser.transforms.SO3.from_matrix(c2w[:3, :3]).wxyz,
+        position=c2w[:3, 3],
+        image=image
+    )
+for i, (o, d) in enumerate(zip(rays_o, rays_d)):
+    server.add_spline_catmull_rom(
+        f"/rays/{i}", positions=np.stack((o, o + d * 6.0)),
+    )
+server.add_point_cloud(
+    f"/samples",
+    colors=np.zeros_like(points).reshape(-1, 3),
+    points=points.reshape(-1, 3),
+    point_size=0.02,
+)
+
+while True:
+    time.sleep(0.1)  # Wait to allow visualization to run</code></pre>
+      </div>
+    </div>
+    <div class="column">
+      <img src="assets/viser_plot.png" height="500" alt="viser plot"
+        style="display: block; margin-left: auto; margin-right: auto" />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <div style="width: 100%; margin: 0 auto">
+        <pre><code># Visualize Cameras, Rays and Samples
+import viser, time
+import numpy as np
+
+# --- You Need to Implement These ------
+dataset = RaysData(images_train, K, c2ws_train)
+
+# This will check that your uvs aren't flipped
+uvs_start = 0
+uvs_end = 40_000
+sample_uvs = dataset.uvs[uvs_start:uvs_end] # These are integer coordinates of widths / heights (xy not yx) of all the pixels in an image
+# uvs are array of xy coordinates, so we need to index into the 0th image tensor with [0, height, width], so we need to index with uv[:,1] and then uv[:,0]
+assert np.all(images_train[0, sample_uvs[:,1], sample_uvs[:,0]] == dataset.pixels[uvs_start:uvs_end])
+
+# # Uncoment this to display random rays from the first image
+# indices = np.random.randint(low=0, high=40_000, size=100)
+
+# # Uncomment this to display random rays from the top left corner of the image
+# indices_x = np.random.randint(low=100, high=200, size=100)
+# indices_y = np.random.randint(low=0, high=100, size=100)
+# indices = indices_x + (indices_y * 200)
+
+data = {"rays_o": dataset.rays_o[indices], "rays_d": dataset.rays_d[indices]}
+points = sample_along_rays(data["rays_o"], data["rays_d"], random=True)
+# ---------------------------------------
+
+server = viser.ViserServer(share=True)
+for i, (image, c2w) in enumerate(zip(images_train, c2ws_train)):
+  server.add_camera_frustum(
+    f"/cameras/{i}",
+    fov=2 * np.arctan2(H / 2, K[0, 0]),
+    aspect=W / H,
+    scale=0.15,
+    wxyz=viser.transforms.SO3.from_matrix(c2w[:3, :3]).wxyz,
+    position=c2w[:3, 3],
+    image=image
+  )
+for i, (o, d) in enumerate(zip(data["rays_o"], data["rays_d"])):
+  positions = np.stack((o, o + d * 6.0))
+  server.add_spline_catmull_rom(
+      f"/rays/{i}", positions=positions,
+  )
+server.add_point_cloud(
+    f"/samples",
+    colors=np.zeros_like(points).reshape(-1, 3),
+    points=points.reshape(-1, 3),
+    point_size=0.03,
+)
+
+while True:
+    time.sleep(0.1)  # Wait to allow visualization to run</code></pre>
+      </div>
+    </div>
+    <div class="column">
+      <img src="assets/single-camera-1.png" height="500" alt="viser plot of a single image (v1)"
+        style="display: block; margin-left: auto; margin-right: auto" />
+      <img src="assets/single-camera-2.png" height="500" alt="viser plot of a single image (v2)"
+        style="display: block; margin-left: auto; margin-right: auto" />
+      <img src="assets/upper-left-single-camera.png" height="500" alt="viser plot of top left rays in a single image"
+        style="display: block; margin-left: auto; margin-right: auto" />
+    </div>
+  </div>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 2.4: Neural Radiance Field</h3>
+
+  <p class="text">
+    <b>[Impl: Network]</b> After having samples in 3D, we want to use the network to predict the density and color for
+    those samples in
+    3D. So you would create a MLP that is similar to Part 1, but with three changes:
+  </p>
+  <ul>
+    <li>
+      Input is now 3D world coordinates instead of 2D pixel coordinates, along side a 3D vector as the ray direction.
+      And we are going to
+      output not only the color, but also the density for the 3D points. In the radiance field, the color of each point
+      depends on the
+      view direction, so we are going to use the view direction as the condition when we predict colors. Note we use
+      Sigmoid to constrain
+      the output color within range (0, 1), and use ReLU to constrain the output density to be positive. The ray
+      direction also needs to
+      be encoded by positional encoding (PE) but can use less frequency (e.g., L=4) than the cooridnate PE (e.g., L=10).
+    </li>
+    <li>
+      Make the MLP deeper. We are now doing a more challenging task of optimizing a 3D representation instead of 2D. So
+      we need a more
+      powerful network.
+    </li>
+    <li>
+      Inject the input (after PE) to the middle of your MLP through concatenation. It's a general trick for
+      <em>deep</em> neural network,
+      that is helpful for it to not forgetting about the input.
+    </li>
+  </ul>
+  <p class="text">Below is a structure of the network that you can start with:</p>
+  <img src="assets/mlp_nerf.png" alt="MLP" height="250" style="display: block; margin-left: auto; margin-right: auto" />
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 2.5: Volume Rendering</h3>
+
+  <p class="text">
+    The core volume rendering equation is as follows: \[\begin{align} C(\mathbf{r})=\int_{t_n}^{t_f} T(t)
+    \sigma(\mathbf{r}(t))
+    \mathbf{c}(\mathbf{r}(t), \mathbf{d}) d t, \text { where } T(t)=\exp \left(-\int_{t_n}^t \sigma(\mathbf{r}(s)) d
+    s\right)
+    \end{align}\]
+  </p>
+  <p class="text">
+    This fundamentally means that at every small step \(dt\) along the ray, we add the contribution of that small
+    interval \([t, t + dt]\)
+    to that final color, and we do the infinitely many additions if these infintesimally small intervals with an
+    integral.
+  </p>
+  <p class="text">
+    The discrete approximation (thus tractable to compute) of this equation can be stated as the following:
+    \[\begin{align}
+    \hat{C}(\mathbf{r})=\sum_{i=1}^N T_i\left(1-\exp \left(-\sigma_i \delta_i\right)\right) \mathbf{c}_i, \text { where
+    } T_i=\exp
+    \left(-\sum_{j=1}^{i-1} \sigma_j \delta_j\right) \end{align}\] where \(\textbf{c}_i\) is the color obtained from our
+    network at sample
+    location \(i\), \(T_i\) is the probability of a ray <em>not</em> terminating before sample location \(i\), and \(1 -
+    e^{-\sigma_i
+    \delta_i}\) is the probability of terminating at sample location \(i\).
+  </p>
+  <p class="text">If your volume rendering works, the following snippet of code should pass the assert statement:</p>
+
+  <div style="width: 600px; margin: 0 auto">
+    <pre><code>import torch
+torch.manual_seed(42)
+sigmas = torch.rand((10, 64, 1))
+rgbs = torch.rand((10, 64, 3))
+step_size = (6.0 - 2.0) / 64
+rendered_colors = volrend(sigmas, rgbs, step_size)
+
+correct = torch.tensor([
+    [0.5006, 0.3728, 0.4728],
+    [0.4322, 0.3559, 0.4134],
+    [0.4027, 0.4394, 0.4610],
+    [0.4514, 0.3829, 0.4196],
+    [0.4002, 0.4599, 0.4103],
+    [0.4471, 0.4044, 0.4069],
+    [0.4285, 0.4072, 0.3777],
+    [0.4152, 0.4190, 0.4361],
+    [0.4051, 0.3651, 0.3969],
+    [0.3253, 0.3587, 0.4215]
+  ])
+assert torch.allclose(rendered_colors, correct, rtol=1e-4, atol=1e-4)</code></pre>
+  </div>
+
+  <p class="text">
+    <b>[Impl]</b> Here you will implement the volume rendering equation for a batch of samples along a ray. This
+    rendered color is what we
+    will compare with our posed images in order to train our network. You would need to implement this part in torch
+    instead of numpy
+    because we need the loss to be able to backpropagate through this part. A hint is that you may find
+    <a href="https://pytorch.org/docs/stable/generated/torch.cumsum.html">torch.cumsum</a> or
+    <a href="https://pytorch.org/docs/stable/generated/torch.cumprod.html">torch.cumprod</a>
+    useful here.
+  </p>
+
+  <p class="text">
+    <b>[Deliverables]</b> As a reference, the images below show the process of optimizing the network to fit on our lego
+    multi-view images
+    from a novel view. The staff solution reaches above 23 PSNR with 1000 gradient steps and a batchsize of 10K rays per
+    gradent step. The
+    staff solution uses an Adam optimizer with a learning rate of 5e-4. For guaranteed full credit, achieve 23 PSNR for
+    any number of
+    iterations.
+  </p>
+  <img src="assets/nerf_training.jpg" alt="training" height="200"
+    style="display: block; margin-left: auto; margin-right: auto" />
+  <ul>
+    <li>Include a brief description of how you implement each part.</li>
+    <li>
+      Report the visualization of the rays and samples you draw at a single training step (along with the cameras),
+      similar to the plot we
+      show above. Plot up to 100 rays to make it less crowded.
+    </li>
+    <li>
+      Visualize the training process by plotting the predicted images across iterations, similar to the above reference,
+      as well as the
+      PSNR curve on the validation set (6 images).
+    </li>
+    <li>
+      After you train the network, you can use it to render a novel view image of the lego from arbitrary camera
+      extrinsic. Show a
+      spherical rendering of the lego video using the provided cameras extrinsics (<code>c2ws_test</code> in the npz
+      file). You should be
+      get a video like this (left is 10 after minutes training, right is 2.5 hrs training):
+    </li>
+  </ul>
+  <!-- <video width="320" height="320" controls style="display: block; margin-left: auto; margin-right: auto">
+      <source src="assets/lego.mp4" type="video/mp4" />
+    </video> -->
+
+  <div style="text-align: center">
+    <video width="320" height="320" autoplay muted loop style="display: inline-block">
+      <source type="video/mp4" src="assets/lego.mp4" />
+    </video>
+    <video width="320" height="320" autoplay muted loop style="display: inline-block">
+      <source type="video/mp4" src="assets/video_2.5h.mp4" />
+    </video>
+  </div>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Part 2.6: Training with your own data</h3>
+  <p>You will now use the dataset you created in part 0 to create a NeRF of your chosen object. After training a NeRF
+    on your dataset render a gif of novel views from your scene. We have provided some starter code below which may
+    be useful.
+    <br/><br/>
+    <b>[UPDATE 11/14/2025]</b>
+    <br/>
+    We have also decided to include the calibrated Lafufu Dataset which can be found <a href="assets/lafufu_dataset.npz">here</a>.
+  </p>
+
+  <div style="width: 600px; margin: 0 auto">
+    <pre>
+        <code>def look_at_origin(pos):
+  # Camera looks towards the origin
+  forward = -pos / np.linalg.norm(pos)  # Normalize the direction vector
+
+  # Define up vector (assuming y-up)
+  up = np.array([0, 1, 0])
+
+  # Compute right vector using cross product
+  right = np.cross(up, forward)
+  right = right / np.linalg.norm(right)
+
+  # Recompute up vector to ensure orthogonality
+  up = np.cross(forward, right)
+
+  # Create the camera-to-world matrix
+  c2w = np.eye(4)
+  c2w[:3, 0] = right
+  c2w[:3, 1] = up
+  c2w[:3, 2] = forward
+  c2w[:3, 3] = pos
+
+  return c2w
+
+def rot_x(phi):
+    return np.array([
+        [math.cos(phi), -math.sin(phi), 0, 0],
+        [math.sin(phi), math.cos(phi), 0, 0],
+        [0,0,1,0],
+        [0,0,0,1],
+    ])
+
+# TODO: Change start position to a good position for your scene such as 
+# the translation vector of one of your training camera extrinsics
+START_POS = np.array([1., 0., 0.])
+NUM_SAMPLES = 60
+
+frames = []
+for phi in np.linspace(360., 0., NUM_SAMPLES, endpoint=False):
+    c2w = look_at_origin(START_POS)
+    extrinsic = rot_x(phi/180.*np.pi) @ c2w
+    
+    # Generate view for this camera pose
+    # TODO: Add code for generating a view with your model from the current extrinsic
+    frame = ...
+    frames.append(frame)
+        </code>
+      </pre>
+  </div>
+
+  <p>
+    Helpful Tips / Common Mistakes:
+  </p>
+  <ul>
+    <li>
+      When using the test data our near and far parameters are set to 2.0 and 6.0 respectively. You will likely have to
+      adjust these for the real data you collect. These parameters represent the minimum and maximum distance away from
+      the camera's sensor that we start and stop sampling. For our example we found that near = 0.02 and far = 0.5
+      worked well, but you will likely have to do some experimenting to find values that work for you.
+    </li>
+    <li>
+      You might want to increase the number of samples along your rays for your real data. This will take longer to
+      train, but can improve visual quality of your NeRF. For our implementation we first trained with 32 samples in
+      order to ensure that there are no issues or bugs in other parts of our code and then increased to 64 samples per
+      ray to get our final result.
+    </li>
+    <li>
+      If training is taking an unreasonable amount of time, your image resolution may be the issue. Attempting to train
+      with too large of images may take a long time. If you resize your images you need to ensure that your intrinsics
+      matrix reflects this change either by resizing before doing calibration or adjusting the intrinsics matrix after
+      recovering it.
+    </li>
+  </ul>
+
+  <p class="text">
+    <b>[Impl]</b> Train a NeRF on your chosen object dataset collected in part 0. Make sure to save the training loss
+    over iterations as well as to generate intermediate renders for the deliverables.
+  </p>
+
+  <p class="text">
+    <b>[Deliverables]</b> Create a gif of a camera circling the object showing novel views and discuss any code or
+    hyperparameter changes you had to make. Include a plot of the training loss as well as some intermediate renders
+    of the scene while it is training.
+  </p>
+
+  <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px;">
+    <div style="text-align: center;">
+      <img src="assets/labubu_nerf.gif" alt="Labubu NeRF" height="500" style="display: inline-block" />
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="text-align: center; display: flex; justify-content: center; gap: 10px;">
+        <img src="assets/labubu_train_500.png" alt="Labubu Training at 500 iterations" height="200"
+          style="display: inline-block" />
+        <img src="assets/labubu_train_2000.png" alt="Labubu Training at 2000 iterations" height="200"
+          style="display: inline-block" />
+        <img src="assets/labubu_train_6000.png" alt="Labubu Training at 6000 iterations" height="200"
+          style="display: inline-block" />
+      </div>
+      <div style="text-align: center;">
+        <img src="assets/labubu_stats.png" alt="Labubu Training Loss Statistics" height="300"
+          style="display: inline-block" />
+      </div>
+    </div>
+  </div>
+
+  <hr style="font-weight: bold;"/>
+
+  <h3>Bells & Whistles</h3>
+
+  <h4>Required for CS 280A students only:</h4>
+  <ul>
+    <li>
+      <b>Render the depths map video for the Lego scene.</b> Instead of compositing per-point colors to the pixel color in the
+      volume rendering, we can also composite per-point depths to the pixel depth. (See the reference video below)
+    </li>
+  </ul>
+
+  <h4>Optional for all students:</h4>
+  <p class="text">
+    The following are optional explorations for any students interested in going deeper with NeRF.
+  </p>
+  <ul>
+    <li>
+      Better (more efficient) sampling: Implement course-to-fine PDF resampling as described in the original
+      <a href="https://www.matthewtancik.com/nerf">NeRF paper</a>.
+    </li>
+    <li>
+      Better NeRF representations: Replace MLP with something more advanced to make it faster. (e.g.
+      <a href="https://apchenstu.github.io/TensoRF/">TensoRF</a> or <a
+        href="https://nvlabs.github.io/instant-ngp/">Instant-NGP</a>). For
+      this part it is ok to borrow some code from existing implementations (mark reference!) to your code base and see
+      how it affect your
+      NeRF optimization.
+    </li>
+    <li>
+      Improve PSNR to 30+: Aside from better sampling, better NeRF representations, try other things you can think of to
+      improve the
+      quality of the images to get 30+ db in PSNR.
+    </li>
+    <li>
+      Render the Lego video with a different background color than black. You would need to revisit the volume rendering
+      equation to see
+      where you should inject the background color.
+    </li>
+    <li>
+      Implement scene contraction for large scenes as specified in <a href="https://jonbarron.info/mipnerf360/">Mip-NeRF 360</a>.
+      This allows NeRF to handle unbounded scenes by contracting distant points into a bounded space.
+    </li>
+    <li>
+      Use <a href="https://docs.nerf.studio/">nerfstudio</a> to make a cool video!
+    </li>
+  </ul>
+  <video width="640" height="320" autoplay muted loop style="display: block; margin-left: auto; margin-right: auto">
+    <source type="video/mp4" src="assets/depths.mp4" />
+  </video>
+
+  <hr style="font-weight: bold;"/>
+
+  <h1>Deliverables Checklist</h1>
+  <p class="text">
+    Make sure your submission includes all of the following:
+  </p>
+
+  <ul>
+    <li>Submit your webpage public URL to the class gallery by filling out <a href="https://forms.gle/nbpg6wATeCDU5sj49" target="_blank">this</a> form.</li>
+  </ul>
+
+  <h3>Part 0: Camera Calibration and 3D Scanning</h3>
+  <ul>
+    <li>2 screenshots of your camera frustums visualization in Viser</li>
+  </ul>
+
+  <h3>Part 1: Fit a Neural Field to a 2D Image</h3>
+  <ul>
+    <li>Model architecture report (number of layers, width, learning rate, and other important details)</li>
+    <li>Training progression visualization on both the provided test image and one of your own images</li>
+    <li>Final results for 2 choices of max positional encoding frequency and 2 choices of width (2x2 grid)</li>
+    <li>PSNR curve for training on one image of your choice</li>
+  </ul>
+
+  <h3>Part 2: Fit a Neural Radiance Field from Multi-view Images</h3>
+  <ul>
+    <li>Brief description of how you implemented each part</li>
+    <li>Visualization of rays and samples with cameras (up to 100 rays)</li>
+    <li>Training progression visualization with predicted images across iterations</li>
+    <li>PSNR curve on the validation set</li>
+    <li>Spherical rendering video of the Lego using provided test cameras</li>
+  </ul>
+
+  <h3>Part 2.6: Training with Your Own Data</h3>
+  <ul>
+    <li>GIF of camera circling your object showing novel views</li>
+    <li>Discussion of code or hyperparameter changes you made</li>
+    <li>Plot of training loss over iterations</li>
+    <li>Intermediate renders of the scene during training</li>
+  </ul>
+
+  <h3>Bells & Whistles (if applicable)</h3>
+  <ul>
+    <li><b>CS 280A students:</b> Depth map video for the Lego scene</li>
+    <li><b>Optional:</b> Any additional explorations you completed</li>
+  </ul>
+
+</body>
+<grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration>
+
+</html>
