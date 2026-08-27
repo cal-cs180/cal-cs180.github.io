@@ -403,7 +403,7 @@
             class="example"
           />
           <p>
-            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1TMA_uP_dpiSN_L2lFsDPQzF57vl6OQ35nHKzAKAUy6s/edit?usp=sharing">here</a>.
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1FAPDS8Rjyw1yh5Th-KmhemrPhbU0DC6n57lyijz0qS0/edit?usp=sharing">here</a>.
           </p>
         </div>
 
@@ -1734,7 +1734,11 @@
       projects.appendChild(finalProject);
       const submissionNote = [...projects.querySelectorAll('p')].find((paragraph) => paragraph.textContent.includes('submission specification'));
       projects.appendChild(submissionNote);
-      projects.querySelectorAll('a').forEach((link) => { link.href = './projects-coming-soon.html'; });
+      const proj0Item = projectItems.find((item) => item.textContent.includes('Project 0'));
+      projects.querySelectorAll('a').forEach((link) => {
+        if (proj0Item?.contains(link)) return;
+        link.href = './projects-coming-soon.html';
+      });
 
       const discussions = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Discussions');
       const topicsTable = discussions.querySelectorAll('table')[1];
