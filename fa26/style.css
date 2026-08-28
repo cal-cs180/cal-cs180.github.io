@@ -452,6 +452,17 @@ table {
     padding: var(--space-sm);
     font-size: var(--font-size-sm);
   }
+
+  .schedule-section .table-cell {
+    overflow-wrap: anywhere;
+  }
+
+  .schedule-section .table-cell img {
+    width: 100%;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+  }
   
   .project-item img {
     max-width: 100%;
