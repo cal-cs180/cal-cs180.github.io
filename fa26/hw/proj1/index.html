@@ -167,7 +167,7 @@
   <p>
     A few of the digitized glass plate images (both hi-res and low-res
     versions) will be placed in the following zip file (note that the filter
-    order from top to bottom is BGR, not RGB!): <a href="https://drive.google.com/file/d/1XQUUR3R9qnVICT8I3hxd7cMxp5WfqkCA/view?usp=sharing" target="_blank">data.zip</a> (<a href="./gallery/" target="_blank">online gallery for preview</a>).
+    order from top to bottom is BGR, not RGB!): <a href="https://drive.google.com/file/d/1gJT5EcsANLwNVEhswTKQ3sR81wTEF0tu/view?usp=sharing" target="_blank">data.zip</a>.
 
     Your program will take a glass plate
     image as input and produce a single color image as output. The program
@@ -184,8 +184,9 @@
     <b>Euclidean Distance</b> which is simply
     <code>sqrt(sum(sum((image1-image2).^2)))</code> where the sum is taken over the
     pixel values. Another is <b>Normalized Cross-Correlation</b> (NCC), which is
-    simply a dot product between two normalized vectors: (<code>image1./||image1||</code>
-    and <code>image2./||image2||</code>).
+    simply a dot product between two mean-subtracted, normalized vectors:
+    (<code>(image1-mean(image1))./||image1-mean(image1)||</code>
+    and <code>(image2-mean(image2))./||image2-mean(image2)||</code>).
   </p>
   
   <p>
@@ -322,11 +323,11 @@
   <ul>
     <li>The results of a single-scale alignment (using NCC/L2 norm metrics) on the low-resolution images (JPEG files).</li>
     <li>
-      The results of a multi-scale pyramid alignment (using NCC/L2 norm metrics) on <b>all</b> of our
-      <a href="https://drive.google.com/file/d/1XQUUR3R9qnVICT8I3hxd7cMxp5WfqkCA/view?usp=sharing">example images</a>. List the offsets you computed.
+      The results of a multi-scale pyramid alignment (using NCC/L2 norm metrics computed on RGB pixel values) on <b>all</b> of our
+      <a href="https://drive.google.com/file/d/1gJT5EcsANLwNVEhswTKQ3sR81wTEF0tu/view?usp=sharing">example images</a>. List the offsets you computed.
     </li>
     <li>
-      The results of your algorithm (using NCC/L2 norm metrics) on a few examples of your choosing,
+      The results of your algorithm (using NCC/L2 norm metrics) on a few (3+) examples of your choosing,
       downloaded from the <a href="https://www.loc.gov/collections/prokudin-gorskii/?st=grid">Prokudin-Gorskii collection</a>.
     </li>
     <li>
@@ -336,7 +337,7 @@
       Describe any bells and whistles you implemented. For maximum credit, show before-and-after images.
     </li>
     <li>
-      <strong>Submit your webpage URL to the class gallery via <a href="https://forms.gle/u4YEUGMo79swCcwt9" target="_blank">Google Form</a>.</strong>
+      <strong>Submit your webpage URL to the class gallery via <a href="https://forms.gle/Jym32eVnrdL4iHwn9" target="_blank">Google Form</a>.</strong>
       Also include this URL in your Gradescope submission.
     </li>
   </ul>
@@ -386,10 +387,10 @@
       <div class="rubric-indent">
         <p><b>For results:</b></p>
         <ul>
-          <li><b>+50%:</b> Alignment defects on ≤ 1 / 14 images.</li>
-          <li><b>+40%:</b> Alignment defects on ≤ 3 / 14 images, or missing.</li>
-          <li><b>+30%:</b> Alignment defects on ≤ 6 / 14 images, or missing.</li>
-          <li><b>+20%:</b> Alignment defects on &gt; 6 / 14 images, but effort shown.</li>
+          <li><b>+50%:</b> Alignment defects on ≤ 1 / 17 images (14 provided images, 3 you selected).</li>
+          <li><b>+40%:</b> Alignment defects on ≤ 3 / 17 images, or missing.</li>
+          <li><b>+30%:</b> Alignment defects on ≤ 6 / 17 images, or missing.</li>
+          <li><b>+20%:</b> Alignment defects on &gt; 6 / 17 images, but effort shown.</li>
           <li><b>0%:</b> No effort on alignment.</li>
         </ul>
         <p><b>For presentation:</b></p>
