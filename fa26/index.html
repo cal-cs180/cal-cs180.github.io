@@ -1740,8 +1740,9 @@
       const submissionNote = [...projects.querySelectorAll('p')].find((paragraph) => paragraph.textContent.includes('submission specification'));
       projects.appendChild(submissionNote);
       const proj0Item = projectItems.find((item) => item.textContent.includes('Project 0'));
+      const proj1Item = projectItems.find((item) => item.textContent.includes('Project 1'));
       projects.querySelectorAll('a').forEach((link) => {
-        if (proj0Item?.contains(link)) return;
+        if (proj0Item?.contains(link) || proj1Item?.contains(link)) return;
         link.href = './projects-coming-soon.html';
       });
 
