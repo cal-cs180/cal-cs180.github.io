@@ -603,8 +603,8 @@
                   <ul>
                     <li>
                       Slides:
-                      <a href="./coming-soon.html">pptx</a>,
-                      <a href="./coming-soon.html">pdf</a>
+                      <a href="./Lectures/CapturingLight2026.pptx">pptx</a>,
+                      <a href="./Lectures/CapturingLight2026.pdf">pdf</a>
                     </li>
                     <li>
                       <a href="https://youtu.be/6tTNgvAl1y4">Color in 5 minutes</a>
@@ -1722,7 +1722,7 @@
       courseInfo.after(classSchedule);
       const projects = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Programming Projects');
       classSchedule.after(projects);
-      [...classSchedule.querySelectorAll('tbody tr')].slice(2).forEach((row) => row.remove());
+      [...classSchedule.querySelectorAll('tbody tr')].slice(3).forEach((row) => row.remove());
 
       const projectItems = [...projects.querySelectorAll(':scope > .project-item')];
       const nerfProject = projectItems.find((item) => item.textContent.includes('Neural Radiance Field'));
