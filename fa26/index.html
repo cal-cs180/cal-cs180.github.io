@@ -1749,7 +1749,7 @@
 
       const discussions = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Discussions');
       const topicsTable = discussions.querySelectorAll('table')[1];
-      [...topicsTable.querySelectorAll('tbody')].slice(1).forEach((body) => body.remove());
+      [...topicsTable.querySelectorAll('tbody')].slice(2).forEach((body) => body.remove());
 
       const courseDescription = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Course Description');
       const exams = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Exams');
