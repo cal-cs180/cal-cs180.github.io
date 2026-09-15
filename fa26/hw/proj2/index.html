@@ -13,7 +13,7 @@
 </h1>
 
 <h2 style="opacity: 1; color: rgb(255, 0, 0); background-color: rgb(255, 255, 255);">
-  Due Date: 11:59pm on Friday, Sep 26, 2025 [START EARLY]
+  Due Date: 11:59pm on Friday, Sep 29, 2025 [START EARLY]
  
 </h2>
 
@@ -41,7 +41,7 @@ In this part, we will build intuitions about 2D convolutions and filtering.
 
 <br>
 First, let's recap what a convolution is. Implement it with four for loops, then two for loops. 
-Implement padding, with zero fill values; convolution without padding will receive partial credit.
+Implement padding, with zero fill values (implement "same" or "full" padding); convolution without padding will receive partial credit. Your implementation should flip the filter.
 Compare it with a built-in convolution function 
 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.convolve2d.html"><code>scipy.signal.convolve2d</code></a>!
 
@@ -66,7 +66,7 @@ First, show the partial derivative in x and y of the <a href="https://inst.eecs.
 <h3>Part 1.3: Derivative of Gaussian (DoG) Filter</h3>
 
   <p class="text">
-  We noted that the results with just the difference operator were rather noisy. Luckily, we have a smoothing operator handy: the Gaussian filter <b>G</b>. Create a blurred version of the original image by convolving with a gaussian and repeat the procedure in the previous part (one way to create a 2D gaussian filter is by using cv2.getGaussianKernel() to create a 1D gaussian and then taking an outer product with its transpose to get a 2D gaussian kernel). 
+  We noted that the results with just the difference operator were rather noisy. Luckily, we have a smoothing operator handy: the Gaussian filter <b>G</b>. Create a blurred version of the original image by convolving with a gaussian and repeat the procedure in the previous part showing the graident magnitude images and binarized gradient magnitude image. One way to create a 2D gaussian filter is by using cv2.getGaussianKernel() to create a 1D gaussian and then taking an outer product with its transpose to get a 2D gaussian kernel. 
 <ul>
   <li>
     What differences do you see?
@@ -126,7 +126,7 @@ frequency (smooth) part of the signal can be seen. By blending the high frequenc
 <h3>Details</h3>
 
 <p class="text">
-<a href="https://inst.eecs.berkeley.edu/~cs180/fa24/hw/proj2/hybrid_python.zip">Here</a>, we have included two sample images (of Derek and his former cat Nutmeg) and some
+<a href="https://drive.google.com/file/d/1ZjbOP-2dkZAiVDOpgPO7BbMCWfvybgUs/view?usp=sharing">Here</a>, we have included two sample images (of Derek and his former cat Nutmeg) and some
 starter code that can be used to load two images and align them. The alignment is important because it affects
 the perceptual grouping (read the paper for details).</p>
 
@@ -157,7 +157,7 @@ low-frequency component, or both?
 <h2>Multi-resolution Blending and the Oraple journey</h3>
 </p><p class="text">
 </p><h3>Overview</h3>
-<p class="text">The goal of this part of the assignment is to blend two images seamlessly using a multi resolution blending as described in the 1983 <a href="http://persci.mit.edu/pub_pdfs/spline83.pdf">paper</a> by Burt and Adelson. An <em>image spline</em> is a smooth seam joining two image together by gently distorting them. <em>Multiresolution blending </em> computes a gentle seam between the two images seperately at each band of image frequencies, resulting in a much smoother seam.</p>  
+<p class="text">The goal of this part of the assignment is to blend two images seamlessly using a multi resolution blending as described in the 1983 <a href="https://www.cs.princeton.edu/courses/archive/fall05/cos429/papers/burt_adelson.pdf">paper</a> by Burt and Adelson. An <em>image spline</em> is a smooth seam joining two image together by gently distorting them. <em>Multiresolution blending </em> computes a gentle seam between the two images seperately at each band of image frequencies, resulting in a much smoother seam.</p>  
 <p align="left" class="text">We'll approach this section in two steps: 
   <ol>
     <li>creating and visualizing the Gaussian and Laplacian stacks and</li>
@@ -179,7 +179,7 @@ low-frequency component, or both?
       To create the successive levels of the Gaussian Stack, just apply the Gaussian filter at each level, but do not subsample.
     In this way we will get a stack that behaves similarly to a pyramid that was downsampled to half its size at each level. If you would rather work with pyramids, you may implement pyramids other than stacks. However, in any case, you are <strong>NOT</strong> allowed to use built-in pyramid functions like<span style="font-family: Courier New; font-size: 11.0pt"> cv2.pyrDown() </span>or<span style="font-family: Courier New; font-size: 11.0pt"> skimage.transform.pyramid_gaussian() </span>in this project. You must implement your stacks from scratch!</div>
   </li>
-  <li>Apply your Gaussian and Laplacian stacks to the Oraple and recreate the outcomes of Figure 3.42 in <a href="https://www.dropbox.com/s/bzt69u4azxyfpjo/SzeliskiBookDraft_20210828.pdf?dl=0">Szelski (Ed 2)</a> page 167, as you can see in the image above. Review the 1983 <a href="http://persci.mit.edu/pub_pdfs/spline83.pdf">paper</a> for more information.</li>
+  <li>Apply your Gaussian and Laplacian stacks to the Oraple and recreate the outcomes of Figure 3.42 in <a href="https://www.dropbox.com/s/bzt69u4azxyfpjo/SzeliskiBookDraft_20210828.pdf?dl=0">Szelski (Ed 2)</a> page 167, as you can see in the image above. Review the 1983 <a href="https://www.cs.princeton.edu/courses/archive/fall05/cos429/papers/burt_adelson.pdf">paper</a> for more information.</li>
 </ol>
 <p class="text">
 </p><p class="text">
@@ -187,14 +187,14 @@ low-frequency component, or both?
 <p align="center" class="text"><img src="./files/orple.jpg" alt="half apple half orange" width="406" height="285" align="middle">
 </p><p class="text">
 </p><h3>Overview</h3>
-<p class="text">Review the 1983 <a href="http://persci.mit.edu/pub_pdfs/spline83.pdf">paper</a> by Burt and Adelson, if you haven't! This will provide you with the context to continue. In this part, we'll focus on actually blending two images together.</p>
+<p class="text">Review the 1983 <a href="https://www.cs.princeton.edu/courses/archive/fall05/cos429/papers/burt_adelson.pdf">paper</a> by Burt and Adelson, if you haven't! This will provide you with the context to continue. In this part, we'll focus on actually blending two images together.</p>
 <h3>Details</h3>
 <p class="text"><a href="https://inst.eecs.berkeley.edu/~cs180/fa24/hw/proj2/spline.zip">Here</a>, we have included the two sample images from the paper (of an apple and an orange).</p>
 <ol>
   <li> First, you'll need to get a few pairs of images that you want blend together with a vertical or horizontal seam.  You can use the sample
   images for debugging, but you should use your own images in your results. Then you will need to write some code in order to use your Gaussian and Laplacian stacks from part 2 in order to blend the images together. Since we are using stacks instead of pyramids like in the paper, the algorithm described on page 226 will not work as-is. If you try it out, you will find that you end up with a very clear seam between the apple and the orange since in the pyramid case the downsampling/blurring/upsampling hoopla ends up blurring the abrupt seam proposed in this algorithm. Instead, you should always use a mask as is proposed in the algorithm on page 230,
   and remember to create a Gaussian stack for your mask image as well as for the two input images. The Gaussian blurring of the mask in the pyramid will smooth out the transition between the two images. For the vertical or horizontal seam, your mask will simply be a step function of the same size as the original images.</li>
-  <li>Now that you've made yourself an oraple (a.k.a your vertical or horizontal seam is nicely working), pick two pairs of images to blend together with an irregular mask, as is demonstrated in figure 8 in the paper.<span style="font-size:11.0pt;font-family:Courier New"></span></li>
+  <li>Now that you've made yourself an oraple (a.k.a your vertical or horizontal seam is nicely working), pick two pairs of images to blend together with an irregular mask (something besides a line), as is demonstrated in figure 8 in the paper.<span style="font-size:11.0pt;font-family:Courier New"></span></li>
   <li>Blend together some crazy ideas of your own!</li>
   <li>Illustrate the process by applying your  Laplacian stack and displaying it for your favorite result and the masked input images that created it.  This should look similar to Figure 10 in the paper.</li>
 </ol>
@@ -210,7 +210,7 @@ For this project you must turn in both your code and a project webpage as descri
 
 
 <br>
-Also, submit the webpage URL to the class gallery via Google Form <a href="https://forms.gle/hnfh2X9kvJKns9HQ9">here</a>.
+Also, submit the webpage URL to the class gallery via Google Form <a href="https://forms.gle/XwXBpGgkLTJehzxQ9">here</a>.
 
 <br>
 <br>
