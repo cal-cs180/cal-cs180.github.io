@@ -442,7 +442,7 @@
             <img src="463_files/orple.jpg" alt="Orange-apple hybrid" style="max-width: 262px;" />
           </div>
           <p>
-            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1fTCyFaqQJ61xQgaOysvfaPcPp4BTMVqdun0Z8tnp8DI/edit?usp=sharing">here</a>.
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1XIE3Dio0twOwBBdUTNK1nNK66sTdzOBT5et5OuNRg54/edit?usp=sharing">here</a>.
           </p>
           <div class="class-choice">
             <img src="463_files/cup_gold.png" alt="Gold award" />
@@ -1742,8 +1742,9 @@
       projects.appendChild(submissionNote);
       const proj0Item = projectItems.find((item) => item.textContent.includes('Project 0'));
       const proj1Item = projectItems.find((item) => item.textContent.includes('Project 1'));
+      const proj2Item = projectItems.find((item) => item.textContent.includes('Project 2'));
       projects.querySelectorAll('a').forEach((link) => {
-        if (proj0Item?.contains(link) || proj1Item?.contains(link)) return;
+        if (proj0Item?.contains(link) || proj1Item?.contains(link) || proj2Item?.contains(link)) return;
         link.href = './projects-coming-soon.html';
       });
 
