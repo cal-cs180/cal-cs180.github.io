@@ -9,76 +9,81 @@
     <meta name="description" content="CS180/280A Introduction to Computer Vision and Computational Photography at UC Berkeley - Fall 2025. Hands-on course covering image processing, computer vision, and computational photography." />
     <link rel="stylesheet" href="style.css" />
     <style>
-      .section-captions {
-        position: fixed;
-        top: 15rem;
-        left: max(1rem, calc((100vw - 1200px) / 2));
-        width: 240px;
-        max-height: calc(100vh - 17rem);
-        overflow-y: auto;
-        z-index: 10;
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-        margin: 0;
-        border: 1px solid var(--border-gray);
-        border-radius: var(--border-radius);
-        background: var(--light-gray);
-        padding: 1rem 0.75rem;
-        box-shadow: var(--box-shadow);
+      main.course-layout {
+        display: grid;
+        grid-template-columns: 200px minmax(0, 1fr);
+        gap: 40px;
+        padding-top: 24px;
       }
-      .section-captions a {
-        border: 0;
-        border-left: 3px solid transparent;
-        background: transparent;
-        color: var(--berkeley-blue);
-        cursor: pointer;
-        font: inherit;
-        font-weight: 600;
-        padding: 0.6rem 0.75rem;
-        text-align: left;
+      .course-content {
+        min-width: 0;
       }
-      .section-captions a:hover,
-      .section-captions a.active {
-        border-left-color: var(--california-gold);
-        color: var(--founders-rock);
+      .course-content > section {
+        scroll-margin-top: 24px;
       }
-      main.container {
-        position: relative;
-        display: block;
-        padding-left: 270px;
-      }
-      main > section {
-        margin-left: 0;
-      }
-      main > .course-info-section:first-of-type {
+      .course-content > .course-info-section:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        padding-left: 0;
         background-color: transparent;
         border-left: 0;
-        padding-left: 0;
       }
-      @media (max-width: 700px) {
-        main.container { padding-left: var(--space-sm); }
+      .section-captions {
+        position: sticky;
+        top: 24px;
+        align-self: start;
+        max-height: calc(100vh - 48px);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        border-left: 1px solid var(--border-gray);
+        font-size: 16px;
+        line-height: 1.4;
+      }
+      .section-captions a {
+        border-left: 3px solid transparent;
+        color: var(--medium-gray);
+        font-weight: 500;
+        padding: 8px 12px;
+        text-decoration: none;
+      }
+      .section-captions a:hover {
+        color: var(--berkeley-blue);
+      }
+      .section-captions a.active {
+        border-left-color: var(--california-gold);
+        color: var(--berkeley-blue);
+        font-weight: 600;
+      }
+      .section-captions a:focus-visible {
+        outline: 2px solid var(--berkeley-blue);
+        outline-offset: -2px;
+      }
+      @media (max-width: 900px) {
+        main.course-layout {
+          display: block;
+        }
         .section-captions {
           position: static;
-          top: auto;
-          width: auto;
           max-height: none;
           overflow: visible;
           flex-direction: row;
           flex-wrap: wrap;
-          gap: 0.75rem 1rem;
-          margin: 0 0 2rem;
-          border: 0;
+          gap: 4px 16px;
+          margin-bottom: 24px;
+          border-left: 0;
           border-bottom: 1px solid var(--border-gray);
-          padding-right: 0;
-          padding: 0 0 0.5rem;
+          padding-bottom: 8px;
         }
         .section-captions a {
           border-left: 0;
           border-bottom: 2px solid transparent;
-          padding: 0.5rem 0 0.65rem;
+          padding: 8px 0;
         }
-        .section-captions a.active { border-bottom-color: var(--california-gold); }
+        .section-captions a.active {
+          border-bottom-color: var(--california-gold);
+        }
       }
     </style>
   </head>
@@ -1770,25 +1775,60 @@
       [...exams.children].slice(1).forEach((child) => courseDescription.appendChild(child));
       exams.remove();
 
-      const sectionNames = ['Course Information', 'Course Description and Exams', 'Office Hours', 'Prerequisites', 'Discussions'];
-      const sections = sectionNames.map((name) =>
-        [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === name)
-      );
+      // Keep the existing section anchors working while following the page order.
+      const navigation = [
+        { section: courseInfo, id: 'section-0', label: 'Course Information' },
+        { section: classSchedule, id: 'schedule', label: 'Schedule' },
+        { section: projects, id: 'projects', label: 'Projects' },
+        { section: [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Office Hours'), id: 'section-2', label: 'Office Hours' },
+        { section: [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Prerequisites'), id: 'section-3', label: 'Prerequisites' },
+        { section: discussions, id: 'section-4', label: 'Discussions & Topics' },
+        { section: courseDescription, id: 'section-1', label: 'Description & Exams' },
+      ];
       const captionBar = document.createElement('nav');
       captionBar.className = 'section-captions';
       captionBar.setAttribute('aria-label', 'Course sections');
-
-      sectionNames.forEach((name, index) => {
-        const link = document.createElement('a');
-        const id = `section-${index}`;
-        sections[index].id = id;
-        link.href = `#${id}`;
-        link.textContent = name === 'Discussions' ? 'Discussions & Topics' : name;
-        captionBar.appendChild(link);
+      navigation.forEach((item) => {
+        item.section.id = item.id;
+        item.link = document.createElement('a');
+        item.link.href = `#${item.id}`;
+        item.link.textContent = item.label;
+        captionBar.appendChild(item.link);
       });
-      if (!window.location.hash) window.scrollTo(0, 0);
-      classSchedule.after(captionBar);
-      document.querySelector('main').prepend(captionBar);
+
+      const main = document.querySelector('main');
+      const content = document.createElement('div');
+      content.className = 'course-content';
+      content.append(...main.childNodes);
+      main.append(captionBar, content);
+      main.classList.add('course-layout');
+
+      function updateActiveSection() {
+        let active = navigation[0];
+        navigation.forEach((item) => {
+          if (item.section.getBoundingClientRect().top <= 80) active = item;
+        });
+        navigation.forEach((item) => {
+          const isActive = item === active;
+          item.link.classList.toggle('active', isActive);
+          if (isActive) item.link.setAttribute('aria-current', 'location');
+          else item.link.removeAttribute('aria-current');
+        });
+      }
+      let scrollPending = false;
+      window.addEventListener('scroll', () => {
+        if (scrollPending) return;
+        scrollPending = true;
+        requestAnimationFrame(() => {
+          updateActiveSection();
+          scrollPending = false;
+        });
+      }, { passive: true });
+      window.addEventListener('resize', updateActiveSection);
+      window.addEventListener('load', updateActiveSection);
+      const initialSection = navigation.find((item) => `#${item.id}` === window.location.hash);
+      if (initialSection) initialSection.section.scrollIntoView();
+      updateActiveSection();
     </script>
   </body>
 </html>
