@@ -783,8 +783,8 @@
               <ul>
                 <li>
                   Slides:
-                  <a href="./coming-soon.html">pptx</a>,
-                  <a href="./coming-soon.html">pdf</a>
+                  <a href="./Lectures/TextureModels2026.pptx">pptx</a>,
+                  <a href="./Lectures/TextureModels2026.pdf">pdf</a>
                 </li>
                 <li>
                     <a href="https://visionbook.mit.edu/homogeneous_coordinates.html#sec-image_wrapping"
@@ -1160,8 +1160,8 @@
               <ul>
                 <li>
                   Slides:
-                  <a href="./coming-soon.html">pptx</a>,
-                  <a href="./coming-soon.html">pdf</a>
+                  <a href="./Lectures/TextureModels2026.pptx">pptx</a>,
+                  <a href="./Lectures/TextureModels2026.pdf">pdf</a>
                 </li>
                 <li>
                     <a
@@ -1733,7 +1733,7 @@
       courseInfo.after(classSchedule);
       const projects = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Programming Projects');
       classSchedule.after(projects);
-      [...classSchedule.querySelectorAll('tbody tr')].slice(7).forEach((row) => row.remove());
+      [...classSchedule.querySelectorAll('tbody tr')].slice(8).forEach((row) => row.remove());
 
       const projectItems = [...projects.querySelectorAll(':scope > .project-item')];
       const nerfProject = projectItems.find((item) => item.textContent.includes('Neural Radiance Field'));
