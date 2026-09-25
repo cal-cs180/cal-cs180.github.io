@@ -802,16 +802,16 @@
               <span class="font-helvetica">Sep 24</span>
             </td>
             <td class="table-cell" style="width: 62%">
-              <b><span class="font-helvetica">Homographies and Mosaics</span></b
+              <b><span class="font-helvetica">Image-to-Image Translation</span></b
               ><br />
-              <img src="./463_files/mosaic.png" class="image" alt="mosaic" />
+              <img src="./463_files/deeplearning_texture.jpeg" class="image" alt="Image-to-Image Translation" />
             </td>
             <td class="table-cell table-cell-left-border" style="width: 28%">
               <ul>
                 <li>
                   Slides:
-                  <a href="./coming-soon.html">pptx</a>,
-                  <a href="./coming-soon.html">pdf</a>
+                  <a href="./Lectures/Pix2Pix2026.pptx">pptx</a>,
+                  <a href="./Lectures/Pix2Pix2026.pdf">pdf</a>
                 </li>
                 <li>Szeliski Ch 8</li>
                 <li>
@@ -1189,8 +1189,8 @@
               <ul>
                 <li>
                   Slides:
-                  <a href="./coming-soon.html">pptx</a>,
-                  <a href="./coming-soon.html">pdf</a>
+                  <a href="./Lectures/Pix2Pix2026.pptx">pptx</a>,
+                  <a href="./Lectures/Pix2Pix2026.pdf">pdf</a>
                 </li>
               </ul>
             </td>
@@ -1727,7 +1727,7 @@
       courseInfo.after(classSchedule);
       const projects = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Programming Projects');
       classSchedule.after(projects);
-      [...classSchedule.querySelectorAll('tbody tr')].slice(8).forEach((row) => row.remove());
+      [...classSchedule.querySelectorAll('tbody tr')].slice(9).forEach((row) => row.remove());
 
       const projectItems = [...projects.querySelectorAll(':scope > .project-item')];
       const nerfProject = projectItems.find((item) => item.textContent.includes('Neural Radiance Field'));
