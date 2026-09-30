@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CS180 Project 3: Fun With Flow Models</title>
+<link rel="stylesheet" href="assignment-math.css">
+<script src="assignment-math.js"></script>
+<script defer src="vendor/mathjax/tex-svg-full.js"></script>
+<style>body{max-width:1050px;margin:40px auto;padding:0 22px;font:18px/1.6 system-ui;color:#263238}h1,h2{color:#12325a}a{color:#165a87}section{margin:32px 0}nav{display:flex;gap:20px;flex-wrap:wrap}img{max-width:100%;height:auto}code{background:#f0f2f4;padding:2px 5px}.note{background:#f3f6fa;padding:16px}pre{white-space:pre-wrap}</style>
+<link rel="stylesheet" href="assignment-visuals.css"><link rel="stylesheet" href="assignment-grids.css"><script src="assignment-visuals.js" defer></script><header class="course-masthead">
+  <a href="https://www.berkeley.edu/"><img src="assets/ucbseal.png" alt="University of California, Berkeley seal" width="76" height="76"></a>
+  <div><strong>Programming Project #3</strong><br>
+    <a href="https://cal-cs180.github.io/fa26/">CS180: Intro to Computer Vision and Computational Photography</a><br>
+    <span>University of California, Berkeley</span></div>
+</header>
+<section class="showcase" aria-label="Interactive project examples">
+  <h1 class="showcase-intro">Fun With Flow Models!</h1>
+  <div class="demo-grid">
+    <figure>
+      <button class="demo dissolve" type="button" aria-label="Toggle Campanile before and after text-guided editing" aria-pressed="false">
+        <img src="assets/model-results/text_edit_campanile_original.png" alt="Original Campanile">
+        <img class="after" src="assets/model-results/text_edit_campanile_t0.14.png" alt="Campanile edited with a rocket-ship prompt">
+      </button><figcaption><strong>Text-guided editing</strong><span>Reimagine an image with a prompt.</span></figcaption>
+    </figure>
+    <figure>
+      <button class="demo dissolve" type="button" aria-label="Toggle pixel-art bear before and after the flow model recovers it" aria-pressed="false">
+        <img src="assets/model-results/edit_bear_original.png" alt="Pixel-art teddy bear, the original input" loading="lazy">
+        <img class="after" src="assets/model-results/edit_bear_t0.06.png" alt="The bear redrawn by the flow model" loading="lazy">
+      </button><figcaption><strong>&quot;Make it Real&quot;</strong><span>Noise it, then flow back.</span></figcaption>
+    </figure>
+    <figure>
+      <button class="demo shrink" type="button" aria-label="Toggle viewing distance for waterfall and skull" aria-pressed="false">
+        <img src="assets/model-results/notebook-hybrid-waterfall-skull.svg" alt="Waterfall and skull hybrid image at different viewing distances">
+      </button><figcaption><strong>Look from a distance</strong><span>Waterfall / skull hybrid.</span></figcaption>
+    </figure>
+    <figure>
+      <button class="demo rotate" type="button" aria-label="Rotate old-man and campfire image by 180 degrees" aria-pressed="false">
+        <img src="assets/model-results/all-anagram_0.png" alt="An old man upright, people around a fire upside down">
+      </button><figcaption><strong>Turn it upside down</strong><span>A new story at 180°.</span></figcaption>
+    </figure>
+  </div>
+  <p class="showcase-help">Hover, tap, or focus and press Enter to explore.</p>
+  <p class="example-credit">PixNerd results from our notebook runs.</p>
+  <figure class="sampling-preview">
+    <img src="assets/model-results/partb-class-class_epoch10.png" alt="Class-conditioned MNIST samples from our Part B notebook">
+    <figcaption>From noise to digits · our Part B model after 10 epochs</figcaption>
+  </figure>
+</section>
+<nav aria-label="Project assignments">
+  <a href="parta.html">Part A: Exploring the Power of Flow Models</a>
+  <a href="partb.html">Part B: Flow Matching from Scratch</a>
+</nav>
+<h2>Overview</h2>
+<p>This project has two separate parts. First, use a pretrained flow model to generate and edit images. Then, build and train your own flow-matching model.</p>
+<section>
+  <h2><a href="parta.html">Part A: Exploring the Power of Flow Models</a></h2>
+  <p>Use PixNerd to explore noisy training inputs, velocity predictions, Euler sampling, and classifier-free guidance. Part A has three sections: Visualizing Training and Sampling, Conditional Generation and Guidance, and Creative Applications. Apply these tools to image editing, visual anagrams, and hybrid images. No model training is required in Part A. <a href="parta.html">Link→</a></p>
+</section>
+<section>
+  <h2><a href="partb.html">Part B: Flow Matching from Scratch</a></h2>
+  <p>Build a UNet and train it on MNIST. Start with single-step denoising, then train time-conditioned and class-conditioned flow-matching models and sample new images. <a href="partb.html">Link→</a></p>
+</section>
+<h2>Deliverables</h2>
+<p>Each part has its own instructions and deliverable checklist. Prepare your code and a project webpage showing your results and explanations for both parts.</p>
+<p>Project deadline: October 20, 2026.</p>
+<section id="compute">
+  <h2>Compute</h2>
+  <p>We provide notebooks on Google Colab through the Part A and Part B assignment pages. If your Colab GPU quota runs out or a GPU is unavailable, use Kaggle to continue working with the same notebooks. Kaggle also has usage limits, so save your work and stop GPU sessions when you are done. Follow our <a href="kaggle.html">Kaggle setup guide →</a> to get started.</p>
+</section>
+<footer class="credits"><figure><img src="assets/walrus_preview.png" alt="Original assignment visual anagram by Stephen Su" loading="lazy"><figcaption>Original assignment anagram by <a href="https://jingzhi-su.github.io/cs180-proj5/">Stephen Su</a>.</figcaption></figure>
+<h2>Acknowledgements</h2>
+<p>This project was a joint effort by <a href="https://dangeng.github.io/">Daniel Geng</a>,
+<a href="https://ryantabrizi.com/">Ryan Tabrizi</a>,
+<a href="https://hangg7.com/">Hang Gao</a>,
+<a href="https://jingfeng0705.github.io/">Jingfeng Yang</a>,
+<a href="https://www.linkedin.com/in/jameson-crate/">Jameson Crate</a>,
+<a href="https://himanshusingh.ai/">Himanshu Gaurav Singh</a>,
+<a href="https://www.linkedin.com/in/eric-khodorenko/">Eric Khodorenko</a>, and
+<a href="https://likelvin.com/">Kelvin Li</a>, advised by
+<a href="https://liyueshen.engin.umich.edu/">Liyue Shen</a>,
+<a href="https://andrewowens.com/">Andrew Owens</a>, and
+<a href="https://people.eecs.berkeley.edu/~efros/">Alexei Efros</a>.</p></footer></html>

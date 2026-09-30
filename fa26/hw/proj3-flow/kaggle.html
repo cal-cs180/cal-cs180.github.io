@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CS180 Project 3: Kaggle Setup</title>
+  <style>
+    body{max-width:1050px;margin:40px auto;padding:0 22px;font:18px/1.6 system-ui;color:#263238}
+    h1,h2{color:#12325a}a{color:#165a87}section{margin:28px 0}
+    code{background:#f0f2f4;padding:2px 5px;overflow-wrap:anywhere}
+    pre{background:#f3f6fa;padding:16px;overflow-x:auto;font-size:16px}
+    pre code{background:none;padding:0}li{margin:10px 0}
+    .note{background:#f3f6fa;padding:16px}nav{display:flex;gap:20px;flex-wrap:wrap}
+  </style>
+  <link rel="stylesheet" href="assignment-visuals.css">
+</head>
+<body>
+  <header class="course-masthead">
+    <a href="https://www.berkeley.edu/"><img src="assets/ucbseal.png" alt="University of California, Berkeley seal" width="76" height="76"></a>
+    <div><strong>Programming Project #3</strong><br>CS180: Intro to Computer Vision and Computational Photography<br><span>University of California, Berkeley</span></div>
+  </header>
+  <h1>Running the notebooks on Kaggle</h1>
+  <nav aria-label="Project assignments"><a href="index.html#compute">Compute</a><a href="parta.html">Part A</a><a href="partb.html">Part B</a></nav>
+  <p>If Colab runs out of GPU time or cannot provide a GPU, you can continue on Kaggle using the same student notebook. You do not need an API token, a support ZIP, or separate helper files.</p>
+  <section>
+    <h2>Setup</h2>
+    <ol>
+      <li><strong>Create an account and verify it.</strong> Sign in to <a href="https://www.kaggle.com/">Kaggle</a>, then check <a href="https://www.kaggle.com/settings">account settings</a> for phone verification. Complete the verification requested by Kaggle before trying to enable a GPU. <a href="https://www.kaggle.com/discussions/product-feedback/202584">Kaggle's GPU verification guidance</a>.</li>
+      <li><strong>Bring your notebook.</strong> Open the Notebook link on the <a href="parta.html">Part A</a> or <a href="partb.html">Part B</a> page. In Colab, use <strong>File → Download → Download .ipynb</strong>. If you have already started, download your own working copy so your code is preserved. Runtime files and model checkpoints are separate; they do not travel with the notebook.</li>
+      <li><strong>Import into Kaggle.</strong> Create a <a href="https://www.kaggle.com/code/new">new notebook</a>. In its editor, choose <strong>File → Import Notebook</strong> and upload the <code>.ipynb</code> file. Keep your notebook private so your solutions are not shared with other students. <a href="https://www.kaggle.com/getting-started/400301">Import instructions</a>.</li>
+      <li><strong>Enable a GPU and Internet.</strong> In the <em>notebook editor</em> (not account settings), open <strong>Settings / Session options</strong>, choose <strong>Accelerator → GPU T4 ×2</strong> if available, and turn <strong>Internet</strong> on. If you are viewing a saved notebook, enter <strong>Edit</strong> first. The assignment uses one GPU; the two GPUs' memory is not automatically combined. <a href="https://www.kaggle.com/docs/notebooks">Kaggle notebook settings</a>.</li>
+      <li><strong>Run Setup, then work through the exercises in order.</strong> Setup unpacks the included support files and installs dependencies automatically. The first Part A run downloads several gigabytes of model weights; Part B downloads MNIST. Part A uses float32 throughout—do not change it to bfloat16. If setup explicitly requests a session restart after installing packages, restart once and run Setup again.</li>
+      <li><strong>Save before stopping.</strong> Save a notebook version and download your notebook with outputs, along with any images or checkpoints you need. Files are not automatically transferred back to Colab. Stop the GPU session when you finish to conserve your quota.</li>
+    </ol>
+  </section>
+  <section>
+    <h2>Check the actual runtime</h2>
+    <p>Selecting a GPU in settings is not enough: confirm that the running session sees it. Setup prints the GPU name, or you can run:</p>
+    <pre><code>import torch
+print("CUDA available:", torch.cuda.is_available())
+if torch.cuda.is_available():
+    print("GPU:", torch.cuda.get_device_name(0))</code></pre>
+    <p>Expect <code>True</code> and a GPU name such as <code>Tesla T4</code>. Do not start the full assignment on a CPU-only session.</p>
+  </section>
+  <section>
+    <h2>Troubleshooting</h2>
+    <ul>
+      <li><strong>GPU option missing or greyed out:</strong> make sure you are in the notebook editor, check account verification, and check remaining GPU quota. Read any tooltip or verification prompt next to the disabled option, then refresh after completing verification.</li>
+      <li><strong>“Torch not compiled with CUDA enabled” or CUDA is unavailable:</strong> the session is CPU-only. Recheck the accelerator setting and restart the session with a GPU. Do not try to fix hardware allocation by reinstalling PyTorch.</li>
+      <li><strong>“Temporary failure in name resolution” or downloads fail:</strong> check that Internet is enabled and restart the session if needed. A package “not found” message following DNS errors can be a connectivity failure, not a missing package version.</li>
+      <li><strong>GPU memory runs out:</strong> restart the session and run one notebook from the beginning to clear models left by earlier experiments. If it still fails, send course staff the traceback and GPU name.</li>
+    </ul>
+  </section>
+  <p><a href="index.html#compute">← Back to the assignment</a></p>
+</body>
+</html>

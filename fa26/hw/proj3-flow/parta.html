@@ -1,0 +1,854 @@
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>CS180: Intro to Computer Vision and Computational Photography</title>
+    <link rel="StyleSheet" href="style.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="assignment-math.css">
+    <script src="assignment-math.js"></script>
+    <script defer src="vendor/mathjax/tex-svg-full.js"></script>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+
+    <script>
+      hljs.initHighlightingOnLoad();
+    </script>
+
+    <script>
+      hljs.initHighlightingOnLoad();
+    </script>
+
+    <style>
+      code {
+            background-color: #f4f4f4;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+        .image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.image-container > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40%;
+  max-width: 200px;
+  position: relative;
+  padding: 20px;
+  overflow: visible;
+}
+
+.image-container img {
+  width: 100%;
+  height: auto;
+  transform-origin: center center;
+}
+
+.image-container p {
+  text-align: center;
+  margin-top: 10px;
+}
+      /* Two image containers */
+      .column {
+        float: left;
+        width: 45%;
+        padding: 5px;
+      }
+
+      /* Clear floats after image containers */
+      .row::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+
+      @keyframes rotate180 {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(180deg);
+        }
+      }
+
+      .rotating-image {
+        transition: transform 1.5s;
+        transform: rotate(0deg);
+      }
+
+      .rotating-image:hover {
+        transform: rotate(180deg);
+      }
+
+      .zoom-animation {
+        transition: transform 1s ease-in-out;
+        transform: scale(1);
+      }
+
+      .zoom-animation:hover,
+      .zoom-animation.active {
+        transform: scale(0.25);
+      }
+
+      .rotating-image {
+        transition: transform 1.5s;
+        transform: rotate(0deg);
+      }
+
+      .rotating-image:hover,
+      .rotating-image.active {
+        transform: rotate(180deg);
+      }
+
+      .caption-container {
+        position: relative;
+        height: auto;
+        min-height: 2em;
+        text-align: center;
+        width: 100%;
+        padding: 5px 0;
+      }
+
+      .caption-default, .caption-transform {
+        position: absolute;
+        width: 100%;
+        transition: opacity 1.5s;
+        white-space: normal;
+        left: 0;
+      }
+
+      .caption-transform {
+        opacity: 0;
+      }
+
+      .rotating-image:hover + .caption-container .caption-default,
+      .active + .caption-container .caption-default {
+        opacity: 0;
+      }
+
+      .rotating-image:hover + .caption-container .caption-transform,
+      .active + .caption-container .caption-transform {
+        opacity: 1;
+      }
+
+      .zoom-animation:hover + .caption-container .caption-default {
+        opacity: 0;
+      }
+
+      .zoom-animation:hover + .caption-container .caption-transform {
+        opacity: 1;
+      }
+
+      .image-container > div:hover .zoom-animation {
+        transform: scale(0.25);
+      }
+
+      .image-container > div:hover .caption-default {
+        opacity: 0;
+      }
+
+      .image-container > div:hover .caption-transform {
+        opacity: 1;
+      }
+
+      .caption-container .caption-default {
+        opacity: 1;
+        transition: opacity 1.5s;
+      }
+
+      .caption-container .caption-transform {
+        opacity: 0;
+        transition: opacity 1.5s;
+      }
+
+      .active + .caption-container .caption-default {
+        opacity: 0;
+      }
+
+      .active + .caption-container .caption-transform {
+        opacity: 1;
+      }
+
+      .dissolve-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 100%; /* Creates a square aspect ratio */
+        margin-bottom: 5px; /* Reduced from 10px to match other captions */
+      }
+
+      .dissolve-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: opacity 1s ease-in-out;
+      }
+
+      .dissolve-image.original {
+        opacity: 1;
+      }
+
+      .dissolve-image.edited {
+        opacity: 0;
+      }
+
+      .dissolve-image.original.active {
+        opacity: 0;
+      }
+
+      .dissolve-image.edited.active {
+        opacity: 1;
+      }
+
+      /* Ensure consistent caption styling */
+      .image-container > div p {
+        text-align: center;
+        margin-top: 5px;  /* Reduced from 10px to align with other captions */
+        margin-bottom: 0;
+      }
+
+      /* Hover state */
+      .dissolve-container:hover .dissolve-image.original {
+        opacity: 0;
+      }
+
+      .dissolve-container:hover .dissolve-image.edited {
+        opacity: 1;
+      }
+
+      h1 {
+      font-size: x-large;
+    }
+
+    h1 a {
+      font-size: medium;
+    }
+
+    h1 img {
+      float: left;
+      padding-right: 1em;
+    }
+    </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assignment-layout.css">
+      <link rel="stylesheet" href="assignment-grids.css?v=2">
+  </head>
+  <body data-new-gr-c-s-check-loaded="14.1027.0" data-gr-ext-installed>
+    <h1>
+      <a href="http://www.berkeley.edu/" style="text-decoration: none;">
+        <img
+          src="assets/ucbseal.png"
+          alt="berkeley logo"
+          height="75"
+          width="75"/>
+      </a>
+      Programming Project #3 (<code>proj3</code>)<br>
+      <a href="https://cal-cs180.github.io/fa26/">CS180: Intro to Computer Vision and Computational
+        Photography</a>
+      <br>
+      <a href="http://www.berkeley.edu/"
+                  >University of California, Berkeley</a
+                >
+
+    </h1>
+
+
+    <div class="image-container">
+      <div>
+        <div class="dissolve-container">
+          <img src="assets/model-results/text_edit_campanile_original.png" alt="Original Campanile"
+            class="dissolve-image original">
+          <img src="assets/model-results/text_edit_campanile_t0.14.png" alt="Campanile edited with a rocket-ship prompt"
+            class="dissolve-image edited">
+        </div>
+        <p><b>Text-Guided Editing</b></p>
+      </div>
+      <div>
+
+        <div class="dissolve-container">
+          <img src="assets/model-results/edit_bear_original.png" alt="Pixel-art teddy bear, the original input"
+            class="dissolve-image original">
+          <img src="assets/model-results/edit_bear_t0.06.png" alt="The bear redrawn by the flow model"
+            class="dissolve-image edited">
+        </div>
+        <p><b>&quot;Make it Real&quot;</b></p>
+      </div>
+      <div>
+        <img src="assets/model-results/notebook-hybrid-waterfall-skull.svg" alt="Waterfall and skull hybrid from the experiment notebook"
+          class="zoom-animation">
+        <div class="caption-container">
+          <p class="caption-default"><b>Waterfall / Skull Hybrid</b></p>
+          <p class="caption-transform"><b>A Lithograph of a Skull</b></p>
+        </div>
+      </div>
+      <div>
+        <div class="rotation-frame"><img src="assets/model-results/all-anagram_0.png" alt="PixNerd old-man and campfire visual anagram" class="rotating-image"></div>
+        <div class="caption-container">
+          <p class="caption-default"><b>Old Man / Campfire Anagram</b></p>
+          <p class="caption-transform"><b>An Oil Painting of People Around a
+            Fire</b></p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <br />
+    <h1 style="text-align: center">Part A: Exploring the Power of Flow Models</h1>
+    <h3 style="text-align: center;">The first part of a <a
+        href="./index.html">larger project</a>.</h3>
+    <h3 style="text-align: center;">For this part, you ONLY need to submit the code and website PDF on Gradescope. The Google Form will be required once your webpage is finished for both parts.</h3>
+    <h2 style="text-align: center">
+      <b style="color: red;">Due: October 20, 2026</b>
+    </h2>
+
+    <p style="text-align:center">Starter code can be found in the <a href="https://colab.research.google.com/github/hgaurav2k/cs180-hw3-student-notebooks/blob/main/parta_updated.ipynb" target="_blank" rel="noopener">Notebook</a>.</p>
+    <h2>Overview</h2>
+    <p>Use a pretrained flow model to generate and edit images. You will implement sampling procedures using <a href="https://huggingface.co/MCG-NJU/PixNerd-XXL-P16-T2I">PixNerd-XXL-P16-T2I</a>, which generates $512\times512$ images; no model training is required in Part A. The project has three sections:</p>
+    <ol>
+      <li><a href="#training-and-sampling"><b>Visualizing Training and Sampling.</b></a> Visualize training inputs, compare denoising methods, and implement an image sampler.</li>
+      <li><a href="#conditional-generation"><b>Conditional Generation and Guidance.</b></a> Control generation with text and implement classifier-free guidance.</li>
+      <li><a href="#creative-applications"><b>Creative Applications.</b></a> Apply sampling to image editing and optical illusions.</li>
+    </ol>
+    <p>Complete the sampling, generation, and editing exercises in the notebook, and present your results on your project webpage.</p>
+    <p style="color:#CC0000"><b>START EARLY!</b> Sampling takes time, so allow time to experiment with prompts and review your results.</p>
+    <p><small>Examples below are from our PixNerd notebook runs. Click a result to view it full-size. Follow this page's deliverables and match exercises by title if your notebook uses different section numbers.</small></p>
+
+    <h2>Getting Started: Exploring the Model</h2>
+
+    <h3>Using Your Own Text Prompts</h3>
+    <p>PixNerd was trained as a text-to-image model, which takes text prompts as input and outputs images that are aligned with the text. However, a raw text string cannot be directly used as the model's input—we first convert it into prompt embeddings. The supplied <code>model.encode(prompt)</code> uses Qwen3 and caches these embeddings locally.</p>
+    <p>You will use your own prompts in later exercises for text-guided editing, visual anagrams, and hybrid images. For now, use the prompts specified in each section.</p>
+
+      <h2 id="training-and-sampling">1. Visualizing Training and Sampling</h2>
+      <p>We begin with a recap of training and inference in flow matching.</p>
+
+      <p><b>Linear interpolation.</b> We use linear interpolation, as in the optimal-transport (OT) formulation of flow matching. Given Gaussian noise $x_0=\epsilon\sim\mathcal{N}(0,I)$ and a clean image $x_1$, construct</p>
+      <p>$$x_t=(1-t)x_0+t x_1,\qquad t\in[0,1].$$</p>
+      <p>Thus <b>$t=0$ is noise and $t=1$ is a clean image.</b> Smaller $t$ means more noise.</p>
+
+      <p><b>Training.</b> Sample a clean image $x_1$, independent Gaussian noise $x_0$, and $t\sim\mathcal{U}[0,1]$. Construct $x_t$ with the interpolation above. The model receives $(x_t,t,c)$, where $c$ is a condition such as a text prompt or class label, and is trained to predict the path velocity $x_1-x_0$:</p>
+      <p>$$\mathcal{L}(\theta)=\mathbb{E}\!\left[\left\|v_\theta(x_t,t,c)-(x_1-x_0)\right\|_2^2\right].$$</p>
+      <p>Training evaluates randomly selected times $t$; it does not run a sampling loop.</p>
+
+      <p><b>Sampling.</b> Start from Gaussian noise at $t=0$ and follow the learned velocity field to $t=1$:</p>
+      <p>$$\frac{d x_t}{dt}=v_\theta(x_t,t,c).$$</p>
+      <p>Although each training pair defines a straight path, learned sampling trajectories are generally curved: the predicted direction changes with the current image and time. We therefore integrate the velocity field numerically, using Euler steps that recompute the velocity after each update.</p>
+
+        <h3 id="noisy-training-inputs">1.1 Constructing Noisy Training Inputs</h3>
+
+        <p class="text">Construct a noisy training input by interpolating between a clean image and Gaussian noise:</p>
+        <p>$$x_t=(1-t)\epsilon+t x_1,\qquad\epsilon\sim\mathcal{N}(0,I).\tag{A.1}$$</p>
+        <p class="text">That is, given a clean image $x_1$, sample Gaussian noise and interpolate between the two. This is not just adding noise—we also scale the image. At $t=0$ we have noise; at $t=1$ we have the clean image.</p>
+        <p>Choose <b>one image of your own</b> for Sections 1.1–1.5; the Campanile is only an example. Use the supplied preprocessing to center-crop and resize it to $512\times512$, with RGB values in $[-1,1]$. Sample one Gaussian noise tensor $\epsilon$ and reuse it to construct noisy images at $t\in\{0.25,0.50,0.75\}$. Larger $t$ retains more image information.</p>
+        <b>Deliverables</b><ul><li>Implement <code>interpolate(image, noise, t)</code>.</li><li>Show your original image and all three noisy images, labeled by time.</li></ul>
+        <b>Hints</b><ul><li><code>torch.randn_like</code> is useful for sampling $\epsilon$.</li><li>Check both endpoints. Save the original image tensor, the sampled noise tensor, and all three noisy tensors for reuse in Sections 1.2–1.5. Section 1.4 needs the original image/noise pair to compute the ground-truth velocity.</li></ul>
+<section class="example-panel" aria-label="Forward process"><h4 class="panel-title">Forward process</h4><div class="image-grid"><figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:23;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-training_inputs.png" alt="Original" loading="lazy"></div><figcaption>Original</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:459;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-training_inputs.png" alt="t = 0.25" loading="lazy"></div><figcaption>t = 0.25</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:894;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-training_inputs.png" alt="t = 0.50" loading="lazy"></div><figcaption>t = 0.50</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:1330;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-training_inputs.png" alt="t = 0.75" loading="lazy"></div><figcaption>t = 0.75</figcaption></figure></div></section>
+
+        <h3>1.2 Classical Denoising</h3>
+        <p class="text">Use Gaussian blur as a baseline without a learned flow model. Averaging nearby pixels partially cancels independent, zero-mean noise. Stronger blur reduces noise but also removes image detail, so good results are difficult at high noise levels.</p>
+        <p>The image contribution in $x_t$ is scaled by $t$. For $t&gt;0$, first restore its amplitude, then blur:</p>
+        <p>$$\frac{x_t}{t}=x_1+\frac{1-t}{t}\epsilon,\qquad \hat{x}_1^{\mathrm{blur}}=G_\sigma\!\left(\frac{x_t}{t}\right).$$</p>
+        <p>Here $G_\sigma$ is a Gaussian filter with standard deviation $\sigma$. Dividing by $t$ corrects the image amplitude; it does not remove noise. Apply this baseline to the saved inputs at $t=0.25,0.50,0.75$.</p>
+
+        <b> Deliverables </b>
+        <ul>
+          <li>For each of the three saved noisy versions of your own image from Section 1.1 ($t=0.25,0.50,0.75$), show the noisy input and your best Gaussian-denoised version side by side.</li>
+        </ul>
+
+        <b>Hint:</b>
+        <ul>
+          <li> <code>torchvision.transforms.functional.gaussian_blur</code> is
+            useful. Here is the <a
+              href="https://pytorch.org/vision/0.16/generated/torchvision.transforms.functional.gaussian_blur.html">documentation</a>.</li>
+        </ul>
+
+<section class="example-panel" aria-label="Gaussian blur comparison"><h4 class="panel-title">Gaussian blur comparison</h4><div class="image-grid"><figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:23;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-blur_0.25.png" alt="Noisy input · t = 0.25" loading="lazy"></div><figcaption>Noisy input · t = 0.25</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:459;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-blur_0.25.png" alt="Gaussian blur · t = 0.25" loading="lazy"></div><figcaption>Gaussian blur · t = 0.25</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:23;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-blur_0.5.png" alt="Noisy input · t = 0.5" loading="lazy"></div><figcaption>Noisy input · t = 0.5</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:459;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-blur_0.5.png" alt="Gaussian blur · t = 0.5" loading="lazy"></div><figcaption>Gaussian blur · t = 0.5</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:23;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-blur_0.75.png" alt="Noisy input · t = 0.75" loading="lazy"></div><figcaption>Noisy input · t = 0.75</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:459;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-blur_0.75.png" alt="Gaussian blur · t = 0.75" loading="lazy"></div><figcaption>Gaussian blur · t = 0.75</figcaption></figure></div></section>
+
+
+
+
+
+
+        <h3>1.3 One-Step Denoising</h3>
+
+        <p class="text">Now, we'll use a pretrained flow model to denoise. The supplied <code>predict_velocity(x,t,condition)</code> predicts the velocity at the noisy image and time. We can extrapolate to the clean endpoint using one prediction:</p>
+        <p>$$\hat{x}_1=x_t+(1-t)v_\theta(x_t,t,c).\tag{A.2}$$</p>
+        <p class="text">Because this model was trained with text conditioning, we also need a text prompt embedding. Use the embedding for <code>"a high quality photo"</code>. Later on, you can use your own text prompts.</p>
+        <b>Deliverables</b><ul><li>Implement <code>one_step_denoise</code>.</li><li>For each of the three saved noisy versions of your own image at $t=0.25,0.50,0.75$, show the original, noisy input, and one-step estimate side by side.</li></ul>
+        <b>Hints</b><ul><li>The prediction is velocity, not noise; use Equation A.2 rather than subtracting it.</li><li>Check shape, dtype, and device: the adapter returns velocity with the same shape, dtype, and device as the input. Keep integration states float32; network evaluation is float32.</li><li>Use <code>torch.no_grad()</code> when sampling to save memory. No gradients or model training are needed.</li></ul>
+<section class="example-panel" aria-label="One-step denoising"><h4 class="panel-title">One-step denoising</h4><div class="image-grid"><figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:459;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-one_step_0.25.png" alt="Noisy input · t = 0.25" loading="lazy"></div><figcaption>Noisy input · t = 0.25</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:894;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-one_step_0.25.png" alt="One-step estimate · t = 0.25" loading="lazy"></div><figcaption>One-step estimate · t = 0.25</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:459;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-one_step_0.5.png" alt="Noisy input · t = 0.5" loading="lazy"></div><figcaption>Noisy input · t = 0.5</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:894;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-one_step_0.5.png" alt="One-step estimate · t = 0.5" loading="lazy"></div><figcaption>One-step estimate · t = 0.5</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:459;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-one_step_0.75.png" alt="Noisy input · t = 0.75" loading="lazy"></div><figcaption>Noisy input · t = 0.75</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:894;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-one_step_0.75.png" alt="One-step estimate · t = 0.75" loading="lazy"></div><figcaption>One-step estimate · t = 0.75</figcaption></figure></div></section>
+
+
+
+
+
+        <h3 id="visualize-velocity">1.4 Visualizing Velocity</h3>
+        <p>In Section 1.3, we added $(1-t)\hat v_t$ to the noisy image to estimate the clean image. Here, we will visualize what the model adds.</p>
+        <p>Since we know the original image, we also know exactly what should be added: $x_1-x_t$. Compare this ground-truth update with the model's predicted update. An error heatmap shows where they differ most.</p>
+        <p>Use the same image of your own and saved noisy inputs from Section 1.1, at $t=0.25,0.50,0.75$, with the prompt <code>"a high quality photo"</code>.</p>
+
+        <b>Deliverables</b>
+        <ul>
+          <li>Show the original image <b>once</b>.</li>
+          <li>For each time $t=0.25,0.50,0.75$, display the <b>noisy image $x_t$</b>, <b>predicted update $(1-t)\hat v_t$</b>, <b>ground-truth update $(1-t)v_{\mathrm{gt}}$</b>, and an <b>error heatmap</b>, labeled by time.</li>
+        </ul>
+
+        <b>Implementation hints</b>
+        <ul>
+          <li>The predicted velocity is $\hat v_t=v_\theta(x_t,t,c)$. Using the saved noise from Section 1.1, the ground-truth velocity is $v_{\mathrm{gt}}=x_1-\epsilon$, so its update is $(1-t)v_{\mathrm{gt}}=x_1-x_t$.</li>
+          <li>For the error heatmap, compute the root-mean-square (RMS) difference between the two updates across RGB <b>at each pixel</b>:
+            $$E_t=\sqrt{\operatorname{mean}_{\mathrm{RGB}}\!\left(\big[(1-t)(\hat v_t-v_{\mathrm{gt}})\big]^2\right)}.$$
+            Square the channel differences, average over RGB, and take the square root. This gives one error value per pixel. Compute it before display scaling or clipping.</li>
+          <li>Display all predicted and ground-truth updates on the same symmetric RGB scale, with zero at middle gray.</li>
+          <li>Use <code>matplotlib.pyplot.imshow</code> with a linear color scale for the error maps. Choose <code>vmin</code> and <code>vmax</code> to make the errors visible, keeping the same limits across all three times.</li>
+        </ul>
+        <figure class="model-result">
+          <a class="result-view" href="assets/model-results/velocity_visualization.png" target="_blank" rel="noopener">
+            <img src="assets/model-results/velocity_visualization.png" width="3144" height="1910" loading="lazy" alt="Campanile shown once beside three rows at t = 0.25, 0.50, and 0.75. Each row shows the noisy image, predicted velocity times (1 − t), ground-truth velocity times (1 − t), and the per-pixel RGB RMS error of those updates.">
+          </a>
+        </figure>
+
+        <h3 id="iterative-denoising">1.5 Iterative Denoising with Euler Sampling</h3>
+
+        <p class="text">One-step denoising can be inaccurate because the learned velocity changes as we move along the path. Instead, take a small step, predict a new velocity, and repeat. We use Euler integration:</p>
+        <p>$$x_{t+h}=x_t+h\,v_\theta(x_t,t,c).\tag{A.3}$$</p>
+        <p>Implement <code>euler_sample(x_start,t_start,step_size,velocity)</code>. Use $h=0.02$ and shorten the last step if necessary to end exactly at $t=1$.</p>
+        <b>Deliverables</b><ul><li>Implement <code>euler_sample</code>. Starting with the saved $t=0.50$ noisy version of your own image, perform 25 Euler updates.</li><li>Show the initial state, every fifth update, and final image, labeled by time.</li><li>Compare the final result with your original image, one-step denoising (Section 1.3), and Gaussian blur (Section 1.2), using the same noisy input.</li></ul>
+        <b>Hints</b><ul><li>Recompute velocity after each update. Return both the final image and saved states.</li><li>Test a constant velocity field analytically, including a starting time that needs a shortened final step.</li></ul>
+<section class="example-panel" aria-label="Euler denoising trajectory"><h4 class="panel-title">Euler denoising trajectory</h4><div class="image-grid grid-six"><figure class="image-tile"><a class="tile-media sheet-cell" href="assets/model-results/all-trajectory.png" target="_blank" rel="noopener" style="--sheet-width:1320;--crop-x:25;--crop-y:33;--crop-width:401;--crop-height:401"><img src="assets/model-results/all-trajectory.png" alt="t = 0.50"></a><figcaption>t = 0.50</figcaption></figure>
+<figure class="image-tile"><a class="tile-media sheet-cell" href="assets/model-results/all-trajectory.png" target="_blank" rel="noopener" style="--sheet-width:1320;--crop-x:460;--crop-y:33;--crop-width:401;--crop-height:401"><img src="assets/model-results/all-trajectory.png" alt="t = 0.60"></a><figcaption>t = 0.60</figcaption></figure>
+<figure class="image-tile"><a class="tile-media sheet-cell" href="assets/model-results/all-trajectory.png" target="_blank" rel="noopener" style="--sheet-width:1320;--crop-x:894;--crop-y:33;--crop-width:401;--crop-height:401"><img src="assets/model-results/all-trajectory.png" alt="t = 0.70"></a><figcaption>t = 0.70</figcaption></figure>
+<figure class="image-tile"><a class="tile-media sheet-cell" href="assets/model-results/all-trajectory.png" target="_blank" rel="noopener" style="--sheet-width:1320;--crop-x:25;--crop-y:463;--crop-width:401;--crop-height:400"><img src="assets/model-results/all-trajectory.png" alt="t = 0.80"></a><figcaption>t = 0.80</figcaption></figure>
+<figure class="image-tile"><a class="tile-media sheet-cell" href="assets/model-results/all-trajectory.png" target="_blank" rel="noopener" style="--sheet-width:1320;--crop-x:460;--crop-y:463;--crop-width:401;--crop-height:400"><img src="assets/model-results/all-trajectory.png" alt="t = 0.90"></a><figcaption>t = 0.90</figcaption></figure>
+<figure class="image-tile"><a class="tile-media sheet-cell" href="assets/model-results/all-trajectory.png" target="_blank" rel="noopener" style="--sheet-width:1320;--crop-x:894;--crop-y:463;--crop-width:401;--crop-height:400"><img src="assets/model-results/all-trajectory.png" alt="t = 1.00"></a><figcaption>t = 1.00</figcaption></figure></div></section><section class="example-panel" aria-label="Denoising methods"><h4 class="panel-title">Denoising methods</h4><div class="image-grid"><figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:23;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-comparison.png" alt="Original" loading="lazy"></div><figcaption>Original</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:459;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-comparison.png" alt="Gaussian blur" loading="lazy"></div><figcaption>Gaussian blur</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:894;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-comparison.png" alt="One-step estimate" loading="lazy"></div><figcaption>One-step estimate</figcaption></figure>
+<figure class="image-tile"><div class="tile-media sheet-cell" style="--sheet-width:1760;--crop-x:1330;--crop-y:17;--crop-width:407;--crop-height:406"><img src="assets/model-results/all-comparison.png" alt="Euler denoising" loading="lazy"></div><figcaption>Euler denoising</figcaption></figure></div></section>
+
+
+
+
+      <h3>1.6 Generating Images from Noise</h3>
+      <p class="text">
+        In Section 1.5, we use the flow model to denoise an image. Another
+        thing
+        we can do with the <code>euler_sample</code> function is to
+        generate
+        images from scratch. We can do this by setting <code>t_start = 0</code>
+        and passing <code>x_start</code> as random noise. This effectively denoises pure noise.
+        Please
+        do this, and show 5 results of the prompt<code>"a high quality photo"</code>.
+      </p>
+      <p class="text">
+        <b>Deliverables</b>
+        <ul>
+          <li>Show 5 sampled images.</li>
+        </ul>
+      </p>
+      <p class="text">
+        <b>Hints</b>
+      </p>
+      <ul>
+        <li>Use <code>torch.randn</code> to make the noise.</li>
+        <li>Make sure you move the tensor to the correct device and correct data
+          type (float32) and use
+          <code>.to(device)</code>.</li>
+        <li>The generic prompt may favor particular subjects; report what you observe.
+          In Section 2, we will explore how CFG changes prompt alignment and diversity.</li>
+      </ul>
+
+<section class="example-panel" aria-label="Conditional samples"><h4 class="panel-title">Conditional samples</h4><div class="image-grid grid-six"><figure class="image-tile"><a class="tile-media" href="assets/model-results/all-conditional_0.png" target="_blank" rel="noopener"><img src="assets/model-results/all-conditional_0.png" alt="Seed 180" loading="lazy"></a><figcaption>Seed 180</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-conditional_1.png" target="_blank" rel="noopener"><img src="assets/model-results/all-conditional_1.png" alt="Seed 181" loading="lazy"></a><figcaption>Seed 181</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-conditional_2.png" target="_blank" rel="noopener"><img src="assets/model-results/all-conditional_2.png" alt="Seed 182" loading="lazy"></a><figcaption>Seed 182</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-conditional_3.png" target="_blank" rel="noopener"><img src="assets/model-results/all-conditional_3.png" alt="Seed 183" loading="lazy"></a><figcaption>Seed 183</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-conditional_4.png" target="_blank" rel="noopener"><img src="assets/model-results/all-conditional_4.png" alt="Seed 184" loading="lazy"></a><figcaption>Seed 184</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-conditional_5.png" target="_blank" rel="noopener"><img src="assets/model-results/all-conditional_5.png" alt="Seed 185" loading="lazy"></a><figcaption>Seed 185</figcaption></figure></div></section>
+
+      <h2 id="conditional-generation">2. Conditional Generation and Guidance</h2>
+      <p>Conditional generation means generating an image given information such as a text prompt. Section 1 used a fixed prompt. Here you will strengthen the effect of that prompt using classifier-free guidance (CFG).</p>
+      <h3>2.1 Classifier-Free Guidance (CFG)</h3>
+
+      <p class="text">You may have noticed that the generated images in the prior section are not very good. To improve prompt alignment and image quality, at the expense of diversity, we can use <a href="https://arxiv.org/abs/2207.12598">Classifier-Free Guidance (CFG)</a>.</p>
+      <p>Evaluate the same image and time with a conditional prompt and an empty-string prompt, obtaining $v_c$ and $v_u$. Combine them using:</p>
+      <p>$$v_{\mathrm{cfg}}=v_c+w(v_c-v_u).\tag{A.4}$$</p>
+      <p>Use $w=7$ and Euler step size $h=0.02$. Here $w=0$ is ordinary conditional sampling.</p>
+      <b>Deliverables</b><ul><li>Implement <code>cfg_velocity</code>.</li><li>Show five CFG samples with <code>"a high quality photo"</code>, using the same initial noises as Section 1.6. Compare the results.</li></ul>
+      <b>Hints</b><ul><li>Both predictions must use the same $x_t$ and $t$. Use the empty-string embedding for the unconditional branch.</li><li>Check that $w=0$ reproduces the conditional prediction.</li></ul>
+<section class="example-panel" aria-label="Classifier-free guidance"><h4 class="panel-title">Classifier-free guidance</h4><div class="image-grid grid-six"><figure class="image-tile"><a class="tile-media" href="assets/model-results/all-cfg_0.png" target="_blank" rel="noopener"><img src="assets/model-results/all-cfg_0.png" alt="Seed 180 · guidance w = 7" loading="lazy"></a><figcaption>Seed 180 · guidance w = 7</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-cfg_1.png" target="_blank" rel="noopener"><img src="assets/model-results/all-cfg_1.png" alt="Seed 181 · guidance w = 7" loading="lazy"></a><figcaption>Seed 181 · guidance w = 7</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-cfg_2.png" target="_blank" rel="noopener"><img src="assets/model-results/all-cfg_2.png" alt="Seed 182 · guidance w = 7" loading="lazy"></a><figcaption>Seed 182 · guidance w = 7</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-cfg_3.png" target="_blank" rel="noopener"><img src="assets/model-results/all-cfg_3.png" alt="Seed 183 · guidance w = 7" loading="lazy"></a><figcaption>Seed 183 · guidance w = 7</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-cfg_4.png" target="_blank" rel="noopener"><img src="assets/model-results/all-cfg_4.png" alt="Seed 184 · guidance w = 7" loading="lazy"></a><figcaption>Seed 184 · guidance w = 7</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-cfg_5.png" target="_blank" rel="noopener"><img src="assets/model-results/all-cfg_5.png" alt="Seed 185 · guidance w = 7" loading="lazy"></a><figcaption>Seed 185 · guidance w = 7</figcaption></figure></div></section>
+
+      <h2 id="creative-applications">3. Creative Applications</h2>
+      <p>Use flow sampling to edit existing images and generate optical illusions. Throughout this section, use Euler step size $h=0.02$, CFG weight $w=7$, and the empty prompt <code>""</code> for the unconditional prediction.</p>
+      <h3>3.1 Image-to-Image Editing</h3>
+      <p><a href="assets/campanile.jpg" download="campanile.jpg">Download the Campanile image</a> for Sections 3.1 and 3.2.</p>
+      <p class="text">
+        In Section 1.5, we take a real image, add noise to it, and then denoise.
+        This
+        effectively allows us to make edits to existing images. The more noise
+        we
+        add, the larger the edit will be. This works because in order to denoise
+        an image, the flow model must to some extent "hallucinate" new
+        things
+        -- the model has to be "creative." Another way to think about it is that
+        the denoising process "forces" a noisy image back onto the manifold of
+        natural images.
+      </p>
+      <p class="text">
+        Here, we're going to take the original Campanile image, noise it a little,
+        and
+        force it back onto the image manifold with the generic photo prompt.
+        Effectively, we're going to get an image that is similar to the Campanile
+        (with a low-enough noise level). This is inspired by the <a
+          href="https://sde-image-editing.github.io/">SDEdit</a> algorithm.
+      </p>
+      <p>To start, please run the forward process to get a noisy Campanile, and
+        then run the <code>edit</code> function using a
+        starting time of $[0.02,0.04,0.06,0.10,0.14,0.25,0.5]$ and show the results, labeled with
+        the
+        starting time. You should see a series of "edits" to the original
+        image,
+        gradually matching the original image closer and closer.</p>
+      <b> Deliverables </b>
+      <ul>
+        <li>Edits of the Campanile image, using the given prompt at starting times $[0.02,0.04,0.06,0.10,0.14,0.25,0.5]$ with the conditional text prompt
+          <code>"a high quality photo"</code></li>
+        <li>Edits of 2 of your own test images, using the same procedure.</li>
+      </ul>
+      <p class="text">
+        Hints
+        <ul>
+          <li>You should have a range of images, gradually looking more like the
+            original image</li>
+        </ul>
+      </p>
+
+<section class="example-panel" aria-label="Campanile"><h4 class="panel-title">Campanile</h4><div class="image-grid grid-eight">
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_campanile_original.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_campanile_original.png" alt="Original Campanile input" loading="lazy"></a><figcaption>Original input</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_campanile_t0.02.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_campanile_t0.02.png" alt="Campanile recovered from starting time t = 0.02" loading="lazy"></a><figcaption>Starting time $t=0.02$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_campanile_t0.04.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_campanile_t0.04.png" alt="Campanile recovered from starting time t = 0.04" loading="lazy"></a><figcaption>Starting time $t=0.04$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_campanile_t0.06.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_campanile_t0.06.png" alt="Campanile recovered from starting time t = 0.06" loading="lazy"></a><figcaption>Starting time $t=0.06$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_campanile_t0.10.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_campanile_t0.10.png" alt="Campanile recovered from starting time t = 0.10" loading="lazy"></a><figcaption>Starting time $t=0.10$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_campanile_t0.14.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_campanile_t0.14.png" alt="Campanile recovered from starting time t = 0.14" loading="lazy"></a><figcaption>Starting time $t=0.14$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_campanile_t0.25.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_campanile_t0.25.png" alt="Campanile recovered from starting time t = 0.25" loading="lazy"></a><figcaption>Starting time $t=0.25$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_campanile_t0.50.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_campanile_t0.50.png" alt="Campanile recovered from starting time t = 0.50" loading="lazy"></a><figcaption>Starting time $t=0.50$</figcaption></figure></div><p class="result-note">At $t=0.02$ only a pale vertical shape against blue survives. The tower sharpens as the starting time rises, but the clock face and belfry arches do not come back until $t=0.25$.</p></section><section class="example-panel" aria-label="Pixel bear"><h4 class="panel-title">Pixel bear</h4><div class="image-grid grid-eight">
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_bear_original.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_bear_original.png" alt="Original pixel-art bear input" loading="lazy"></a><figcaption>Original input</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_bear_t0.02.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_bear_t0.02.png" alt="Pixel-art bear recovered from starting time t = 0.02" loading="lazy"></a><figcaption>Starting time $t=0.02$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_bear_t0.04.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_bear_t0.04.png" alt="Pixel-art bear recovered from starting time t = 0.04" loading="lazy"></a><figcaption>Starting time $t=0.04$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_bear_t0.06.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_bear_t0.06.png" alt="Pixel-art bear recovered from starting time t = 0.06" loading="lazy"></a><figcaption>Starting time $t=0.06$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_bear_t0.10.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_bear_t0.10.png" alt="Pixel-art bear recovered from starting time t = 0.10" loading="lazy"></a><figcaption>Starting time $t=0.10$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_bear_t0.14.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_bear_t0.14.png" alt="Pixel-art bear recovered from starting time t = 0.14" loading="lazy"></a><figcaption>Starting time $t=0.14$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_bear_t0.25.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_bear_t0.25.png" alt="Pixel-art bear recovered from starting time t = 0.25" loading="lazy"></a><figcaption>Starting time $t=0.25$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_bear_t0.50.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_bear_t0.50.png" alt="Pixel-art bear recovered from starting time t = 0.50" loading="lazy"></a><figcaption>Starting time $t=0.50$</figcaption></figure></div><p class="result-note">Starting times run from most noise (left) to least. At $t=0.02$ the input is gone entirely and the sampler generates an unrelated photo; by $t=0.25$ the pixel art returns almost unchanged.</p></section>
+
+
+      <h4>Editing Hand-Drawn and Web Images</h4>
+      <p class="text">
+        This procedure works particularly well if we start with a nonrealistic
+        image (e.g. painting, a sketch, some scribbles) and project it onto the
+        natural image manifold.
+      </p>
+      <p class="text">
+        Please experiment by starting with hand-drawn or other non-realistic
+        images and see how you can get them onto the natural image manifold in
+        fun ways.
+      </p>
+      <p class="text">
+        We provide you with 2 ways to provide inputs to the model:
+      </p>
+      <ol>
+        <li>Download images from the web</li>
+        <li>Draw your own images</li>
+      </ol>
+      <p class="text">
+        Please find an image from the internet and apply edits exactly as above.
+        And also draw your own images, and apply edits exactly as above. Feel
+        free to copy the prior cell here. For drawing inspiration, you can check
+        out the examples on <a href="https://sde-image-editing.github.io/">this
+          project page</a>.
+      </p>
+      <p>
+        <b>Deliverables</b>
+        <ul>
+          <li>1 image from the web of your choice, edited using the above method
+            for starting times $[0.02,0.04,0.06,0.10,0.14,0.25,0.5]$ (and whatever additional starting
+            times you want)</li>
+          <li>2 hand drawn images, edited using the above method for starting
+            times $[0.02,0.04,0.06,0.10,0.14,0.25,0.5]$ (and whatever additional starting times
+            you want)</li>
+        </ul>
+
+        <b>Hints</b>
+        <ul>
+          <li>We provide you with preprocessing code to convert web images to the format expected by PixNerd</li>
+          <li>We need a square image. The supplied code center-crops and resizes to 512×512, so
+            just draw in the middle of the canvas.</li>
+        </ul>
+      </p>
+
+<section class="example-panel" aria-label="Web image"><h4 class="panel-title">Web image</h4><div class="image-grid grid-eight">
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_web_example_original.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_web_example_original.png" alt="Original web image input" loading="lazy"></a><figcaption>Original input</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_web_example_t0.02.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_web_example_t0.02.png" alt="Web image recovered from starting time t = 0.02" loading="lazy"></a><figcaption>Starting time $t=0.02$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_web_example_t0.04.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_web_example_t0.04.png" alt="Web image recovered from starting time t = 0.04" loading="lazy"></a><figcaption>Starting time $t=0.04$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_web_example_t0.06.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_web_example_t0.06.png" alt="Web image recovered from starting time t = 0.06" loading="lazy"></a><figcaption>Starting time $t=0.06$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_web_example_t0.10.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_web_example_t0.10.png" alt="Web image recovered from starting time t = 0.10" loading="lazy"></a><figcaption>Starting time $t=0.10$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_web_example_t0.14.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_web_example_t0.14.png" alt="Web image recovered from starting time t = 0.14" loading="lazy"></a><figcaption>Starting time $t=0.14$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_web_example_t0.25.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_web_example_t0.25.png" alt="Web image recovered from starting time t = 0.25" loading="lazy"></a><figcaption>Starting time $t=0.25$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_web_example_t0.50.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_web_example_t0.50.png" alt="Web image recovered from starting time t = 0.50" loading="lazy"></a><figcaption>Starting time $t=0.50$</figcaption></figure></div><p class="result-note">The same sweep on a downloaded image. Between $t=0.04$ and $t=0.14$ the sampler reads the oval frame and dark shapes as a face, and only the original's color palette survives; by $t=0.25$ the waterfall is back.</p></section><section class="example-panel" aria-label="House drawing"><h4 class="panel-title">House drawing</h4><div class="image-grid grid-eight">
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_house_drawing_original.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_house_drawing_original.png" alt="Original house drawing input" loading="lazy"></a><figcaption>Original input</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_house_drawing_t0.02.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_house_drawing_t0.02.png" alt="House drawing recovered from starting time t = 0.02" loading="lazy"></a><figcaption>Starting time $t=0.02$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_house_drawing_t0.04.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_house_drawing_t0.04.png" alt="House drawing recovered from starting time t = 0.04" loading="lazy"></a><figcaption>Starting time $t=0.04$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_house_drawing_t0.06.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_house_drawing_t0.06.png" alt="House drawing recovered from starting time t = 0.06" loading="lazy"></a><figcaption>Starting time $t=0.06$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_house_drawing_t0.10.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_house_drawing_t0.10.png" alt="House drawing recovered from starting time t = 0.10" loading="lazy"></a><figcaption>Starting time $t=0.10$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_house_drawing_t0.14.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_house_drawing_t0.14.png" alt="House drawing recovered from starting time t = 0.14" loading="lazy"></a><figcaption>Starting time $t=0.14$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_house_drawing_t0.25.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_house_drawing_t0.25.png" alt="House drawing recovered from starting time t = 0.25" loading="lazy"></a><figcaption>Starting time $t=0.25$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_house_drawing_t0.50.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_house_drawing_t0.50.png" alt="House drawing recovered from starting time t = 0.50" loading="lazy"></a><figcaption>Starting time $t=0.50$</figcaption></figure></div><p class="result-note">A flat drawing gives the sampler very little to hold on to: at $t=0.02$ it produces a portrait instead, and at $t=0.04$–$t=0.06$ it reads the roof and door as a figure under a peaked shape. The drawing returns by $t=0.10$.</p></section><section class="example-panel" aria-label="Flower drawing"><h4 class="panel-title">Flower drawing</h4><div class="image-grid grid-eight">
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_flower_drawing_original.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_flower_drawing_original.png" alt="Original flower drawing input" loading="lazy"></a><figcaption>Original input</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_flower_drawing_t0.02.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_flower_drawing_t0.02.png" alt="Flower drawing recovered from starting time t = 0.02" loading="lazy"></a><figcaption>Starting time $t=0.02$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_flower_drawing_t0.04.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_flower_drawing_t0.04.png" alt="Flower drawing recovered from starting time t = 0.04" loading="lazy"></a><figcaption>Starting time $t=0.04$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_flower_drawing_t0.06.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_flower_drawing_t0.06.png" alt="Flower drawing recovered from starting time t = 0.06" loading="lazy"></a><figcaption>Starting time $t=0.06$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_flower_drawing_t0.10.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_flower_drawing_t0.10.png" alt="Flower drawing recovered from starting time t = 0.10" loading="lazy"></a><figcaption>Starting time $t=0.10$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_flower_drawing_t0.14.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_flower_drawing_t0.14.png" alt="Flower drawing recovered from starting time t = 0.14" loading="lazy"></a><figcaption>Starting time $t=0.14$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_flower_drawing_t0.25.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_flower_drawing_t0.25.png" alt="Flower drawing recovered from starting time t = 0.25" loading="lazy"></a><figcaption>Starting time $t=0.25$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/edit_flower_drawing_t0.50.png" target="_blank" rel="noopener"><img src="assets/model-results/edit_flower_drawing_t0.50.png" alt="Flower drawing recovered from starting time t = 0.50" loading="lazy"></a><figcaption>Starting time $t=0.50$</figcaption></figure></div><p class="result-note">The low starting times keep only the round pink mass and the stem, reading them as an object on a stick. A recognizable flower appears at $t=0.10$, and by $t=0.25$ the petals are back to flat circles.</p></section>
+
+
+
+
+
+      <h3>3.2 Text-Guided Image Editing</h3>
+
+      <p>Use the same image-to-image editing procedure as Section 3.1, but replace
+        <code>"a high quality photo"</code> with a prompt of your choice that describes
+        the desired edit. The prompt guides how the model changes the image.</p>
+
+      <b>Deliverables</b>
+      <ul>
+        <li>Edits of the Campanile, using a prompt of your choice at starting times $[0.02,0.04,0.06,0.10,0.14,0.25,0.5]$. Show the prompt with your results.</li>
+        <li>Edits of 2 of your own test images, using the same procedure and starting times. Choose a prompt for each image and show it with the results.</li>
+      </ul>
+
+      <b>Hints</b>
+    <ul>
+      <li>Larger starting times preserve more of the original image. Smaller starting times
+        add more noise and give the model more room to change the image according to the prompt.</li>
+    </ul>
+
+<section class="example-panel" aria-label="Campanile → rocket ship"><h4 class="panel-title">Campanile → rocket ship</h4><div class="image-grid grid-eight">
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_campanile_original.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_campanile_original.png" alt="Original Campanile input" loading="lazy"></a><figcaption>Original input</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_campanile_t0.02.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_campanile_t0.02.png" alt="Campanile edited toward a rocket from starting time t = 0.02" loading="lazy"></a><figcaption>Starting time $t=0.02$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_campanile_t0.04.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_campanile_t0.04.png" alt="Campanile edited toward a rocket from starting time t = 0.04" loading="lazy"></a><figcaption>Starting time $t=0.04$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_campanile_t0.06.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_campanile_t0.06.png" alt="Campanile edited toward a rocket from starting time t = 0.06" loading="lazy"></a><figcaption>Starting time $t=0.06$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_campanile_t0.10.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_campanile_t0.10.png" alt="Campanile edited toward a rocket from starting time t = 0.10" loading="lazy"></a><figcaption>Starting time $t=0.10$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_campanile_t0.14.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_campanile_t0.14.png" alt="Campanile edited toward a rocket from starting time t = 0.14" loading="lazy"></a><figcaption>Starting time $t=0.14$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_campanile_t0.25.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_campanile_t0.25.png" alt="Campanile edited toward a rocket from starting time t = 0.25" loading="lazy"></a><figcaption>Starting time $t=0.25$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_campanile_t0.50.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_campanile_t0.50.png" alt="Campanile edited toward a rocket from starting time t = 0.50" loading="lazy"></a><figcaption>Starting time $t=0.50$</figcaption></figure></div><p class="result-note">Prompt: <code>"a photograph of a rocket on a launch pad"</code>. The prompt wins at the low starting times and the tower wins at the high ones; in between, at $t=0.06$–$t=0.14$, the result keeps the Campanile's framing and proportions while the surface becomes a rocket.</p></section><section class="example-panel" aria-label="Text-guided bear editing"><h4 class="panel-title">Text-guided bear editing</h4><div class="image-grid grid-eight">
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_bear_original.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_bear_original.png" alt="Original pixel-art bear input" loading="lazy"></a><figcaption>Original input</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_bear_t0.02.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_bear_t0.02.png" alt="Pixel-art bear edited toward a photograph from starting time t = 0.02" loading="lazy"></a><figcaption>Starting time $t=0.02$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_bear_t0.04.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_bear_t0.04.png" alt="Pixel-art bear edited toward a photograph from starting time t = 0.04" loading="lazy"></a><figcaption>Starting time $t=0.04$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_bear_t0.06.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_bear_t0.06.png" alt="Pixel-art bear edited toward a photograph from starting time t = 0.06" loading="lazy"></a><figcaption>Starting time $t=0.06$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_bear_t0.10.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_bear_t0.10.png" alt="Pixel-art bear edited toward a photograph from starting time t = 0.10" loading="lazy"></a><figcaption>Starting time $t=0.10$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_bear_t0.14.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_bear_t0.14.png" alt="Pixel-art bear edited toward a photograph from starting time t = 0.14" loading="lazy"></a><figcaption>Starting time $t=0.14$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_bear_t0.25.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_bear_t0.25.png" alt="Pixel-art bear edited toward a photograph from starting time t = 0.25" loading="lazy"></a><figcaption>Starting time $t=0.25$</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/text_edit_bear_t0.50.png" target="_blank" rel="noopener"><img src="assets/model-results/text_edit_bear_t0.50.png" alt="Pixel-art bear edited toward a photograph from starting time t = 0.50" loading="lazy"></a><figcaption>Starting time $t=0.50$</figcaption></figure></div><p class="result-note">Prompt: <code>"a photograph of a brown bear in a forest"</code>. Only $t=0.02$ reaches an actual photograph. At $t=0.04$–$t=0.06$ the prompt redraws the toy as a smoothly shaded illustration.</p></section>
+
+
+
+    <h3>3.3 Visual Anagrams</h3>
+    <p class="text">
+      In this part, we are finally ready to implement <a
+        href="https://dangeng.github.io/visual_anagrams/">Visual
+        Anagrams</a> and create optical illusions with flow models. In
+      this part, we will create an image that looks like <code>"an oil
+        painting of an old man"</code>, but when flipped upside
+      down will reveal <code>"an oil painting of people around a campfire"</code>.
+    </p>
+    <p class="text">
+      To do this, we will denoise an image $x_t$ at step $t$ normally with the
+      prompt
+      $p_1$, to obtain velocity estimate
+      $v_1$. But at the same time, we will flip $x_t$ upside down, and
+      denoise with the prompt
+      $p_2$, to get velocity estimate $v_2$. We can flip $v_2$ back, and average the two velocity estimates. We can then perform a
+      Euler step with the averaged velocity estimate.
+    </p>
+    <p class="text">
+      The full algorithm will be:
+    </p>
+    <p class="text">
+      $$ v_1 = \text{CFG velocity}(x_t, t, p_1) $$
+    </p>
+    <p class="text">
+      $$ v_2 = \text{flip}(\text{CFG velocity}(\text{flip}(x_t), t, p_2)) $$
+    </p>
+    <p class="text">
+      $$ v = (v_1 + v_2) / 2 $$
+    </p>
+    <p class="text">
+      where CFG velocity is the guided flow prediction from Section 2.1, $\text{flip}(\cdot)$
+      rotates the image by 180 degrees (flips both spatial axes, not just one), and $p_1$ and $p_2$ are two different
+      text prompt embeddings. And our final velocity estimate is $v$. Please
+      implement the above algorithm and show example of an illusion.
+    </p>
+
+    <b>Deliverables</b>
+    <ul>
+      <li>Correctly implemented <code>visual_anagrams</code> function</li>
+      <li>2 illusions of your choice that change appearance when you flip
+        it upside down (feel free to take inspirations from this <a href="https://dangeng.github.io/visual_anagrams/">page</a>).</li>
+    </ul>
+
+    <b>Hints</b>
+    <ul>
+      <li>You may have to run multiple times to get a really good result for
+        the same reasons as above.</li>
+    </ul>
+
+<section class="example-panel" aria-label="Visual anagrams"><h4 class="panel-title">Visual anagrams</h4><div class="image-grid"><figure class="image-tile"><a class="tile-media" href="assets/model-results/all-anagram_0.png" target="_blank" rel="noopener"><img src="assets/model-results/all-anagram_0.png" alt="Old man · upright" loading="lazy"></a><figcaption>Old man · upright</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-anagram_0.png" target="_blank" rel="noopener"><img src="assets/model-results/all-anagram_0.png" alt="Campfire · rotated 180°" loading="lazy" class="upside-down"></a><figcaption>Campfire · rotated 180°</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-anagram_1.png" target="_blank" rel="noopener"><img src="assets/model-results/all-anagram_1.png" alt="Village · upright" loading="lazy"></a><figcaption>Village · upright</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/all-anagram_1.png" target="_blank" rel="noopener"><img src="assets/model-results/all-anagram_1.png" alt="Horse · rotated 180°" loading="lazy" class="upside-down"></a><figcaption>Horse · rotated 180°</figcaption></figure></div></section>
+
+
+    <h3 id="hybrid-images">3.4 Hybrid Images</h3>
+    <p class="text">
+      In this part we'll adapt <a
+        href="https://arxiv.org/abs/2404.11615">Factorized
+        Diffusion</a> and create hybrid images just like in project 2.
+    </p>
+    <p class="text">
+      In order to create hybrid images with a flow model we can use a
+      similar technique as above. We will create a composite velocity estimate
+      $v$, by predicting velocity with two different text prompts, and
+      then combining low frequencies from one velocity estimate with high
+      frequencies of the other. The algorithm is:
+    </p>
+    <p class="text">
+      $ v_1 = \text{CFG velocity}(x_t, t, p_1) $
+    </p>
+    <p class="text">
+      $ v_2 = \text{CFG velocity}(x_t, t, p_2) $
+    </p>
+    <p class="text">
+      $ v = f_\text{lowpass}(v_1) + f_\text{highpass}(v_2)$
+    </p>
+    <p class="text">
+      where CFG velocity is the guided flow predictor, $f_\text{lowpass}$ is a low pass
+      function, $f_\text{highpass}$ is a high pass function, and $p_1$ and $p_2$
+      are two different text prompt embeddings. Our final velocity estimate is
+      $v$. Please show an example of a hybrid image using this technique
+      (you may have to run multiple times to get a really good result for the
+      same reasons as above). We recommend that you use a gaussian blur of
+      kernel size 265 and sigma 16 at 512×512. Use the composite velocity in the Euler update. The high-pass component is the prediction minus its low-pass version.
+    </p>
+
+    <b>Deliverables</b>
+    <ul>
+      <li>Correctly implemented <code>make_hybrids</code> function</li>
+      <li>2 hybrid images of your choosing (feel free to take inspirations from this <a href="https://dangeng.github.io/factorized_diffusion/">page</a>).</li>
+    </ul>
+
+    <b>Hints</b>
+    <ul>
+      <li>use <code>torchvision.transforms.functional.gaussian_blur</code> </li>
+      <li>You may have to run multiple times to get a really good result for the
+        same reasons as above</li>
+    </ul>
+
+<section class="example-panel" aria-label="Hybrid images — full size and distant views"><h4 class="panel-title">Hybrid images — full size and distant views</h4><div class="image-grid"><figure class="image-tile"><a class="tile-media" href="assets/model-results/notebook-hybrid-waterfall-skull.svg" target="_blank" rel="noopener"><img src="assets/model-results/notebook-hybrid-waterfall-skull.svg" alt="Waterfall / skull hybrid · near view" loading="lazy"></a><figcaption>Near: &ldquo;a lithograph of a waterfall&rdquo;</figcaption></figure>
+<figure class="image-tile"><a class="tile-media distant-view" href="assets/model-results/notebook-hybrid-waterfall-skull.svg" target="_blank" rel="noopener"><img src="assets/model-results/notebook-hybrid-waterfall-skull.svg" alt="Waterfall / skull hybrid · distant view" loading="lazy"></a><figcaption>Distant: &ldquo;a lithograph of a skull&rdquo;</figcaption></figure>
+<figure class="image-tile"><a class="tile-media" href="assets/model-results/notebook-hybrid-forest-cat.svg" target="_blank" rel="noopener"><img src="assets/model-results/notebook-hybrid-forest-cat.svg" alt="Forest / cat hybrid · near view" loading="lazy"></a><figcaption>Near: &ldquo;a lithograph of a forest&rdquo;</figcaption></figure>
+<figure class="image-tile"><a class="tile-media distant-view" href="assets/model-results/notebook-hybrid-forest-cat.svg" target="_blank" rel="noopener"><img src="assets/model-results/notebook-hybrid-forest-cat.svg" alt="Forest / cat hybrid · distant view" loading="lazy"></a><figcaption>Distant: &ldquo;a lithograph of a cat&rdquo;</figcaption></figure></div></section>
+
+
+    <h2>Bells &amp; Whistles</h2>
+    <b>Required for CS280A students only:</b>
+    <ul>
+      <li><b>More visual anagrams!</b> Visual anagrams in Section 3.3 are created by flipping images
+         upside down. However, there are much more transformations that also create visual
+         anagrams! Refer to this <a href="https://arxiv.org/pdf/2311.17919">paper</a> and select two more
+         transformations to create visual anagrams.</li>
+      <li><b>Design a course logo</b>! Doing text-conditioned image-to-image translation on UCB's
+        logo or your drawing may be a good idea.</li>
+    </ul>
+    <b>Optional for all students:</b>
+    <ul>
+      <li><b>Your own ideas</b>: Be creative!</li>
+    </ul>
+
+    <h1>Deliverable Checklist</h1>
+    <ul>
+      <li>Make sure that your website and submission include <b>all the deliverables</b> in each section above.</li>
+      <li>Submit your <b>PDF</b> and <b>code</b> to corresponding assignments on Gradescope.</li>
+      <li><b>The Google Form is not required for Part A</b>; you only need to complete the Google Form after both parts are finished.</li>
+    </ul>
+
+    <script>
+      window.addEventListener('load', function() {
+        const zoomEls = document.querySelectorAll('.zoom-animation');
+        const rotateEls = document.querySelectorAll('.rotating-image');
+        const dissolveOriginals = document.querySelectorAll('.dissolve-image.original');
+        const dissolveEditeds = document.querySelectorAll('.dissolve-image.edited');
+
+        zoomEls.forEach(el => el.classList.add('active'));
+        rotateEls.forEach(el => el.classList.add('active'));
+        dissolveOriginals.forEach(el => el.classList.add('active'));
+        dissolveEditeds.forEach(el => el.classList.add('active'));
+
+        setTimeout(() => {
+          zoomEls.forEach(el => el.classList.remove('active'));
+          rotateEls.forEach(el => el.classList.remove('active'));
+          dissolveOriginals.forEach(el => el.classList.remove('active'));
+          dissolveEditeds.forEach(el => el.classList.remove('active'));
+        }, 2000);
+      });
+    </script>
+    <h3>Acknowledgements</h3>
+    <p>This project was a joint effort by <a
+        href="https://dangeng.github.io/">Daniel Geng</a>, <a
+        href="https://ryantabrizi.com/">Ryan Tabrizi</a>, <a
+        href="https://hangg7.com/">Hang Gao</a>, <a
+        href="https://jingfeng0705.github.io/">Jingfeng Yang</a>, <a
+        href="https://www.linkedin.com/in/jameson-crate/">Jameson Crate</a>, <a
+        href="https://himanshusingh.ai/">Himanshu Gaurav Singh</a>, <a
+        href="https://www.linkedin.com/in/eric-khodorenko/">Eric Khodorenko</a>, and <a
+        href="https://likelvin.com/">Kelvin Li</a>, advised by <a
+        href="https://liyueshen.engin.umich.edu/">Liyue Shen</a>, <a
+        href="https://andrewowens.com/">Andrew Owens</a>, and <a
+        href="https://people.eecs.berkeley.edu/~efros/">Alexei
+        Efros</a>. </p>
+    <grammarly-desktop-integration
+      data-grammarly-shadow-root="true"></grammarly-desktop-integration>
+  </html>

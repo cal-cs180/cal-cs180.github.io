@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Part A — Original and Revised</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; font: 16px/1.4 system-ui; color: #12325a; }
+    header { padding: 12px 20px; border-bottom: 1px solid #ddd; }
+    h1 { margin: 0 0 4px; font-size: 22px; }
+    a { color: #165a87; }
+    main { display: grid; grid-template-columns: 1fr 1fr; flex: 1; min-height: 0; }
+    section { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+    section + section { border-left: 1px solid #ccc; }
+    h2 { margin: 0; padding: 10px 16px; font-size: 17px; background: #f3f6fa; }
+    iframe { width: 100%; flex: 1; min-height: 0; border: 0; }
+    @media (max-width: 700px) { main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } section + section { border-left: 0; border-top: 1px solid #ccc; } }
+  </style>
+</head>
+<body>
+  <header><h1>Part A comparison</h1><a href="index.html">Project overview</a> · Scroll each assignment independently. Links in the headings open full-page views.</header>
+  <main>
+    <section><h2><a href="parta_diffusion_original.html">Original — Diffusion</a></h2><iframe src="parta_diffusion_original.html" title="Original diffusion Part A"></iframe></section>
+    <section><h2><a href="parta.html">Revised — Flow Matching</a></h2><iframe src="parta.html" title="Revised flow matching Part A"></iframe></section>
+  </main>
+</body>
+</html>
