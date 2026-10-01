@@ -860,23 +860,20 @@
               <span class="font-helvetica">Oct 1</span>
             </td>
             <td class="table-cell" style="width: 62%">
-              <b
-                ><span class="font-helvetica"
-                  >Automatic Image Alignment Part 2</span
-                ></b
+              <b><span class="font-helvetica">Flow Matching</span></b
               ><br />
               <img
-                src="./463_files/panoramas.png"
+                src="./463_files/flow_matching.jpg"
                 class="image"
-                alt="Automatic Image Alignment Part 2"
+                alt="Flow Matching"
               />
             </td>
             <td class="table-cell table-cell-left-border" style="width: 28%">
               <ul>
                 <li>
                   Slides:
-                  <a href="./coming-soon.html">pptx</a>,
-                  <a href="./coming-soon.html">pdf</a>
+                  <a href="./Lectures/FlowMatching2026.pptx">pptx</a>,
+                  <a href="./Lectures/FlowMatching2026.pdf">pdf</a>
                 </li>
               </ul>
             </td>
@@ -1237,7 +1234,7 @@
                 ></b
               ><br />
               <img
-                src="./463_files/imgen.png"
+                src="./463_files/flow_matching.jpg"
                 class="image"
                 alt="Flow Matching"
               />
@@ -1246,8 +1243,8 @@
               <ul>
                 <li>
                   Slides:
-                  <a href="https://drive.google.com/file/d/1HaYxWXVCcpkNLfJOFhx73L7NON2ijyzr/view?usp=sharing">key</a>,
-                  <a href="./coming-soon.html">pdf</a>
+                  <a href="./Lectures/FlowMatching2026.pptx">pptx</a>,
+                  <a href="./Lectures/FlowMatching2026.pdf">pdf</a>
                 </li>
               </ul>
             </td>
@@ -1724,7 +1721,7 @@
       courseInfo.after(classSchedule);
       const projects = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Programming Projects');
       classSchedule.after(projects);
-      [...classSchedule.querySelectorAll('tbody tr')].slice(10).forEach((row) => row.remove());
+      [...classSchedule.querySelectorAll('tbody tr')].slice(11).forEach((row) => row.remove());
 
       const projectItems = [...projects.querySelectorAll(':scope > .project-item')];
       const nerfProject = projectItems.find((item) => item.textContent.includes('Neural Radiance Field'));
