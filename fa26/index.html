@@ -318,8 +318,7 @@
                 <td class="table-cell text-center">Week 7</td>
                 <td class="table-cell">Midterm Review</td>
                 <td class="table-cell">
-                  <a href="./discussions/cs180_disc7_midterm.pdf">Slides</a> |
-                  <a href="https://docs.google.com/presentation/d/13nzUQjG47MULgqZ8r0zJf4A_g5wkz_BTPMrzA3pkJbo/edit?usp=sharing">Google Slides</a>
+                  <a href="./discussions/cs180_disc7_midterm.pdf">Slides</a>
                 </td>
               </tr>
             </tbody>
@@ -1746,7 +1745,7 @@
 
       const discussions = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Discussions');
       const topicsTable = discussions.querySelectorAll('table')[1];
-      [...topicsTable.querySelectorAll('tbody')].slice(6).forEach((body) => body.remove());
+      [...topicsTable.querySelectorAll('tbody')].slice(7).forEach((body) => body.remove());
 
       const courseDescription = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Course Description');
       const exams = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Exams');
