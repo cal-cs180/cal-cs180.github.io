@@ -1739,7 +1739,7 @@
       const proj1Item = projectItems.find((item) => item.textContent.includes('Project 1'));
       const proj2Item = projectItems.find((item) => item.textContent.includes('Project 2'));
       projects.querySelectorAll('a').forEach((link) => {
-        if (proj0Item?.contains(link) || proj1Item?.contains(link) || proj2Item?.contains(link) || link === flowAssignmentLink) return;
+        if (proj0Item?.contains(link) || proj1Item?.contains(link) || proj2Item?.contains(link) || flowProject?.contains(link)) return;
         link.href = './projects-coming-soon.html';
       });
 
