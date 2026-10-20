@@ -1023,7 +1023,7 @@
               <ul>
                 <li>
                   Slides:
-                  <a href="./coming-soon.html">pptx</a>,
+                  <a href="./Lectures/FeatureAlignment1_2026.ppt">ppt</a>,
                   <a href="./coming-soon.html">pdf</a>
                 </li>
                 <li>
@@ -1717,7 +1717,7 @@
       courseInfo.after(classSchedule);
       const projects = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Programming Projects');
       classSchedule.after(projects);
-      [...classSchedule.querySelectorAll('tbody tr')].slice(14).forEach((row) => row.remove());
+      [...classSchedule.querySelectorAll('tbody tr')].slice(16).forEach((row) => row.remove());
 
       const projectItems = [...projects.querySelectorAll(':scope > .project-item')];
       const nerfProject = projectItems.find((item) => item.textContent.includes('Neural Radiance Field'));
