@@ -325,8 +325,12 @@
             <tbody>
               <tr>
                 <td class="table-cell text-center">Week 8</td>
-                <td class="table-cell">No Discussion</td>
-                <td class="table-cell">—</td>
+                <td class="table-cell">2D Transformations and Warping</td>
+                <td class="table-cell">
+                  <a href="./discussions/cs180_disc6_2d_transforms_normal.pdf">Sheet</a> |
+                  <a href="./discussions/cs180_disc6_2d_transforms_solutions.pdf">Solutions</a> |
+                  <a href="./discussions/cs180_disc6_2d_transforms_slides.pdf">Slides</a>
+                </td>
               </tr>
             </tbody>
             <tbody>
@@ -1745,7 +1749,7 @@
 
       const discussions = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Discussions');
       const topicsTable = discussions.querySelectorAll('table')[1];
-      [...topicsTable.querySelectorAll('tbody')].slice(7).forEach((body) => body.remove());
+      [...topicsTable.querySelectorAll('tbody')].slice(8).forEach((body) => body.remove());
 
       const courseDescription = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Course Description');
       const exams = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Exams');
