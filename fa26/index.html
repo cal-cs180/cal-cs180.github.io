@@ -466,12 +466,12 @@
         <div class="project-item">
           <h3>
             <a href="hw/proj3/index.html">
-              Project 3: (Auto)stitching and Photo Mosaics
+              Project 4: (Auto)stitching and Photo Mosaics
             </a>
           </h3>
           <img src="463_files/image028.jpg" alt="Photo stitching example" />
           <p>
-            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/154EX_SseR8alNOnkXYRd4Yx5nWV4e2PiyPA1b71hOLM/edit?usp=sharing">here</a>.
+            See the submission gallery <a href="https://docs.google.com/spreadsheets/d/1qtV30K8Q7sRa7C-2xrSS2aT2RhviWnPatyKn2Qr-J_8/edit?usp=sharing">here</a>.
           </p>
           <div class="class-choice">
             <img src="463_files/cup_gold.png" alt="Gold award" />
@@ -1743,7 +1743,7 @@
       const proj1Item = projectItems.find((item) => item.textContent.includes('Project 1'));
       const proj2Item = projectItems.find((item) => item.textContent.includes('Project 2'));
       projects.querySelectorAll('a').forEach((link) => {
-        if (proj0Item?.contains(link) || proj1Item?.contains(link) || proj2Item?.contains(link) || flowProject?.contains(link)) return;
+        if (proj0Item?.contains(link) || proj1Item?.contains(link) || proj2Item?.contains(link) || flowProject?.contains(link) || stitchingProject?.contains(link)) return;
         link.href = './projects-coming-soon.html';
       });
 
