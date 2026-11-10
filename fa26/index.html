@@ -1068,6 +1068,36 @@
           </tr>
 
           <tr class="table-row-border">
+            <td
+              class="table-cell table-cell-right-border text-center"
+              style="width: 8%"
+            >
+              <span class="font-helvetica">Nov 3</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b
+                ><span class="font-helvetica"
+                  >Data Data Data</span
+                ></b
+              ><br />
+              <img
+                src="./463_files/visual_texture.png"
+                class="image"
+                alt="Data Data Data"
+              />
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./Lectures/DataDataData2026.pptx">pptx</a>,
+                  <a href="./Lectures/DataDataData2026.pdf">pdf</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
             <td class="table-cell table-cell-right-border text-center" style="width: 8%">
               <span class="font-helvetica">Nov 10</span>
             </td>
@@ -1165,35 +1195,7 @@
             </td>
           </tr>
 
-          <tr class="table-row-border">
-            <td
-              class="table-cell table-cell-right-border text-center"
-              style="width: 8%"
-            >
-              <span class="font-helvetica">Nov 3</span>
-            </td>
-            <td class="table-cell" style="width: 62%">
-              <b
-                ><span class="font-helvetica"
-                  >Data Data Data</span
-                ></b
-              ><br />
-              <img
-                src="./463_files/visual_texture.png"
-                class="image"
-                alt="Data Data Data"
-              />
-            </td>
-            <td class="table-cell table-cell-left-border" style="width: 28%">
-              <ul>
-                <li>
-                  Slides:
-                  <a href="./Lectures/DataDataData2026.pptx">pptx</a>,
-                  <a href="./Lectures/DataDataData2026.pdf">pdf</a>
-                </li>
-              </ul>
-            </td>
-          </tr>
+          
 
           <tr class="table-row-border">
             <td
@@ -1756,7 +1758,7 @@
       courseInfo.after(classSchedule);
       const projects = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Programming Projects');
       classSchedule.after(projects);
-      [...classSchedule.querySelectorAll('tbody tr')].slice(20).forEach((row) => row.remove());
+      [...classSchedule.querySelectorAll('tbody tr')].slice(21).forEach((row) => row.remove());
 
       const projectItems = [...projects.querySelectorAll(':scope > .project-item')];
       const nerfProject = projectItems.find((item) => item.textContent.includes('Neural Radiance Field'));
