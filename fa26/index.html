@@ -1115,6 +1115,23 @@
           </tr>
 
           <tr class="table-row-border">
+            <td class="table-cell table-cell-right-border text-center" style="width: 8%">
+              <span class="font-helvetica">Nov 12</span>
+            </td>
+            <td class="table-cell" style="width: 62%">
+              <b><span class="font-helvetica">Stereo and Epipolar Geometry</span></b>
+            </td>
+            <td class="table-cell table-cell-left-border" style="width: 28%">
+              <ul>
+                <li>
+                  Slides:
+                  <a href="./Lectures/StereoEpipolar2026.pptx">pptx</a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          <tr class="table-row-border">
             <td
               class="table-cell table-cell-right-border text-center"
               style="width: 8%"
@@ -1758,7 +1775,7 @@
       courseInfo.after(classSchedule);
       const projects = [...document.querySelectorAll('section')].find((section) => section.querySelector('h2')?.textContent.trim() === 'Programming Projects');
       classSchedule.after(projects);
-      [...classSchedule.querySelectorAll('tbody tr')].slice(21).forEach((row) => row.remove());
+      [...classSchedule.querySelectorAll('tbody tr')].slice(22).forEach((row) => row.remove());
 
       const projectItems = [...projects.querySelectorAll(':scope > .project-item')];
       const nerfProject = projectItems.find((item) => item.textContent.includes('Neural Radiance Field'));
