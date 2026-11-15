@@ -1789,7 +1789,11 @@
 
       const finalProject = document.createElement('div');
       finalProject.className = 'project-item';
-      finalProject.innerHTML = '<h3><a href="./projects-coming-soon.html">Final Project</a></h3><p>Details coming soon.</p>';
+      finalProject.id = 'final-project';
+      finalProject.innerHTML = `
+        <h3><a href="https://docs.google.com/document/d/1P2HOxvi1i8d4CYFpuukds-h4sF16XVMeeLb5a68FsQw/edit?tab=t.0">Final Project Instructions</a></h3>
+        <p>Work in teams of four to create a compelling computer vision or computational photography project. The project includes a proposal, two GSI check-ins, a final presentation, and a final deliverable. See the instructions for requirements, deadlines, grading, and ideas for inspiration.</p>
+      `;
       projects.appendChild(finalProject);
       const submissionNote = [...projects.querySelectorAll('p')].find((paragraph) => paragraph.textContent.includes('submission specification'));
       projects.appendChild(submissionNote);
@@ -1797,7 +1801,7 @@
       const proj1Item = projectItems.find((item) => item.textContent.includes('Project 1'));
       const proj2Item = projectItems.find((item) => item.textContent.includes('Project 2'));
       projects.querySelectorAll('a').forEach((link) => {
-        if (proj0Item?.contains(link) || proj1Item?.contains(link) || proj2Item?.contains(link) || flowProject?.contains(link) || stitchingProject?.contains(link)) return;
+        if (proj0Item?.contains(link) || proj1Item?.contains(link) || proj2Item?.contains(link) || flowProject?.contains(link) || stitchingProject?.contains(link) || finalProject.contains(link)) return;
         link.href = './projects-coming-soon.html';
       });
 
